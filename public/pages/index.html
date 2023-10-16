@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap-5.3.2.min.css" rel="stylesheet">
+    <title>CS6515 RSA Tools</title>
+</head>
+<body class="bg-light">
+	<div class="container">
+		<div class="row">
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>GCD</h3>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="gcd-first-number" placeholder="first number" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="gcd-second-number" placeholder="second number" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="gcd-result" placeholder="result" disabled>
+					</div>
+					<button id="gcd-reset-button" class="btn btn-primary">reset</button>
+					<button id="gcd-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>Euler's Totient</h3>
+					<small>ϕ(N) = (p − 1)(q − 1)</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="eulers-totient-p" placeholder="p" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="eulers-totient-q" placeholder="q" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="eulers-totient-result" placeholder="result (ϕ(N))" disabled>
+					</div>
+					<button id="eulers-totient-reset-button" class="btn btn-primary">reset</button>
+					<button id="eulers-totient-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr class="mt-3">
+	<div class="container">
+		<div class="row">
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>Modular Exponentiation</h3>
+					<small>e^(y) mod N</small>
+					<br>
+					<small>fast, O(log(y))</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="modular-exponentiation-e" placeholder="e" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="modular-exponentiation-y" placeholder="y" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="modular-exponentiation-n" placeholder="N" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="modular-exponentiation-result" placeholder="result" disabled>
+					</div>
+					<button id="modular-exponentiation-reset-button" class="btn btn-primary">reset</button>
+					<button id="modular-exponentiation-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>Modular Inverse</h3>
+					<small>e^(-1) mod ϕ(N)</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="modular-inverse-e" placeholder="e" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="modular-inverse-eulers-totient" placeholder="Euler's Totient ϕ(N)" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="modular-inverse-result" placeholder="result" disabled>
+					</div>
+					<button id="modular-inverse-reset-button" class="btn btn-primary">reset</button>
+					<button id="modular-inverse-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr class="mt-3">
+	<div class="container">
+		<div class="row">
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>Prime Relativity</h3>
+					<small>how many 1...N relatively prime with N</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="prime-relativity-n" placeholder="N" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="prime-relativity-result" placeholder="result" disabled>
+					</div>
+					<button id="prime-relativity-reset-button" class="btn btn-primary">reset</button>
+					<button id="prime-relativity-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>Prime Factors</h3>
+					<small>prime factors (p,q) of N</small>
+					<br>
+					<small>Trial Division with Pollard's Rho fallback</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="prime-factors-n" placeholder="N" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="prime-factors-result" placeholder="result" disabled>
+					</div>
+					<button id="prime-factors-reset-button" class="btn btn-primary">reset</button>
+					<button id="prime-factors-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>Is Prime?</h3>
+					<small>checks if x is prime</small>
+					<br>
+					<small>Trial Division algorithm, deterministic</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="is-prime-x" placeholder="x" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="is-prime-result" placeholder="result" disabled>
+					</div>
+					<button id="is-prime-reset-button" class="btn btn-primary">reset</button>
+					<button id="is-prime-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr class="mt-3">
+	<div class="container">
+		<div class="row">
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>RSA</h3>
+					<small>is d and e valid?</small>
+					<br>
+					<small>d * e ≡ 1 mod ϕ(n)</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="is-d-and-e-valid-d" placeholder="d" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="is-d-and-e-valid-e" placeholder="e" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="is-d-and-e-valid-phi-n" placeholder="Euler's Totient ϕ(n)" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="is-d-and-e-valid-result" placeholder="result" disabled>
+					</div>
+					<button id="is-d-and-e-valid-reset-button" class="btn btn-primary">reset</button>
+					<button id="is-d-and-e-valid-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>RSA</h3>
+					<small>calculate N from p,q</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="n-from-pq-p" placeholder="p" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="n-from-pq-q" placeholder="q" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="n-from-pq-result" placeholder="result (N)" disabled>
+					</div>
+					<button id="n-from-pq-reset-button" class="btn btn-primary">reset</button>
+					<button id="n-from-pq-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>RSA</h3>
+					<small>generate encryption key <b>e</b> from p,q</small>
+					<br>
+					<small>(smallest <b>e</b>)</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="encryption-key-p" placeholder="p" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="encryption-key-q" placeholder="q" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="encryption-key-result" placeholder="result (e)" disabled>
+					</div>
+					<button id="encryption-key-reset-button" class="btn btn-primary">reset</button>
+					<button id="encryption-key-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>RSA</h3>
+					<small>hack decryption key <b>d</b> via public key (N,e)</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="public-key-to-private-key-n" placeholder="N" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="public-key-to-private-key-e" placeholder="e" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="public-key-to-private-key-result" placeholder="result (d)" disabled>
+					</div>
+					<button id="public-key-to-private-key-reset-button" class="btn btn-primary">reset</button>
+					<button id="public-key-to-private-key-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>RSA</h3>
+					<small>generate public key (N,e) from p,q,e</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="public-key-p" placeholder="p" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="public-key-q" placeholder="q" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="public-key-e" placeholder="e" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="public-key-result" placeholder="result (N,e)" disabled>
+					</div>
+					<button id="public-key-reset-button" class="btn btn-primary">reset</button>
+					<button id="public-key-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>RSA</h3>
+					<small>generate private key (N,d) from p,q,e</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="private-key-p" placeholder="p" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="private-key-q" placeholder="q" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="private-key-e" placeholder="e" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="private-key-result" placeholder="result (N,d)" disabled>
+					</div>
+					<button id="private-key-reset-button" class="btn btn-primary">reset</button>
+					<button id="private-key-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>RSA</h3>
+					<h6>Encrypt Message</h6>
+					<small>y ≡ m^(e) mod N</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="encrypt-message-m" placeholder="m" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="encrypt-message-e" placeholder="e" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="encrypt-message-n" placeholder="N" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="encrypt-message-result" placeholder="result (y)" disabled>
+					</div>
+					<button id="encrypt-message-reset-button" class="btn btn-primary">reset</button>
+					<button id="encrypt-message-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+			<div class="card col-lg-3 mt-1 p-0">
+				<div class="card-header">
+					<h3>RSA</h3>
+					<h6>Decrypt Message</h6>
+					<small>m ≡ y^(d) mod N</small>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="decrypt-message-y" placeholder="y" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="decrypt-message-d" placeholder="d" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="decrypt-message-n" placeholder="N" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<input type="text" class="form-control" id="decrypt-message-result" placeholder="result (m)" disabled>
+					</div>
+					<button id="decrypt-message-reset-button" class="btn btn-primary">reset</button>
+					<button id="decrypt-message-calculate-button" class="btn btn-primary">calculate</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr class="mt-3">
+    <script src="/javascript/bootstrap-5.3.2.bundle.min.js"></script>
+    <script src="/javascript/jquery-3.6.4.min.js"></script>
+	<script src="/javascript/sweet-alert-2-11.7.32.js"></script>
+</body>
+<script>
+	$(document).ready(function() {
+		setUpGcdListeners();
+		setUpModularExponentiationListeners();
+		setUpModularInverseListeners();
+		setUpEulersTotientListeners();
+		setUpPrimeRelativityListeners();
+		setUpPrimeFactorsListeners();
+		setUpIsPrimeListeners();
+		setUpIsDAndEValidListeners();
+		setUpNFromPqListeners();
+		setUpEncryptionKeyFromPqListeners();
+		setUpPublicKeyFromPqeListeners();
+		setUpPrivateKeyFromPqeListeners();
+		setUpPublicKeyToPrivateKeyListeners();
+		setUpEncryptMessageListeners();
+		setUpDecryptMessageListeners();
+	});
+	
+	function setUpGcdListeners() {
+		$('#gcd-calculate-button').click(function(event) {
+			const gcdFirstNumber = Number($('#gcd-first-number').val());
+			const gcdSecondNumber = Number($('#gcd-second-number').val());
+			
+			const gcdResult = gcd(gcdFirstNumber, gcdSecondNumber);
+			
+			$('#gcd-result').val(gcdResult);
+		});
+		
+		$('#gcd-reset-button').click(function(event) {
+			$('#gcd-first-number').val('');
+			$('#gcd-second-number').val('');
+			$('#gcd-result').val('');
+		});
+	}
+	
+	function setUpModularExponentiationListeners() {
+		$('#modular-exponentiation-calculate-button').click(function(event) {
+			const e = Number($('#modular-exponentiation-e').val());
+			const y = Number($('#modular-exponentiation-y').val());
+			const n = Number($('#modular-exponentiation-n').val());
+			
+			const modularExponentiationResult = modularExponentiation(e, y, n);
+			
+			$('#modular-exponentiation-result').val(modularExponentiationResult);
+		});
+		
+		$('#modular-exponentiation-reset-button').click(function(event) {
+			$('#modular-exponentiation-e').val('');
+			$('#modular-exponentiation-y').val('');
+			$('#modular-exponentiation-n').val('');
+			$('#modular-exponentiation-result').val('');
+		});
+	}
+	
+	function setUpEulersTotientListeners() {
+		$('#eulers-totient-calculate-button').click(function(event) {
+			const p = Number($('#eulers-totient-p').val());
+			const q = Number($('#eulers-totient-q').val());
+			
+			const eulersTotient = getEulersTotient(p, q);
+			
+			$('#eulers-totient-result').val(eulersTotient);
+		});
+		
+		$('#eulers-totient-reset-button').click(function(event) {
+			$('#eulers-totient-p').val('');
+			$('#eulers-totient-q').val('');
+			$('#eulers-totient-result').val('');
+		});
+	}
+	
+	function setUpModularInverseListeners() {
+		$('#modular-inverse-calculate-button').click(function(event) {
+			const e = Number($('#modular-inverse-e').val());
+			const eulersTotient = Number($('#modular-inverse-eulers-totient').val());
+			
+			const modularInverseResult = calculateModularInverse(e, eulersTotient);
+			
+			$('#modular-inverse-result').val(modularInverseResult);
+		});
+		
+		$('#modular-inverse-reset-button').click(function(event) {
+			$('#modular-inverse-e').val('');
+			$('#modular-inverse-eulers-totient').val('');
+			$('#modular-inverse-result').val('');
+		});
+	}
+	
+	function setUpPrimeRelativityListeners() {
+		$('#prime-relativity-calculate-button').click(function(event) {
+			const n = Number($('#prime-relativity-n').val());
+			
+			const primeFactors = getPrimeFactors(n);
+			
+			const p = primeFactors[0];
+			const q = primeFactors[1];
+			
+			const eulersTotient = getEulersTotient(p, q);
+			
+			$('#prime-relativity-result').val(eulersTotient);
+		});
+		
+		$('#prime-relativity-reset-button').click(function(event) {
+			$('#prime-relativity-n').val('');
+			$('#prime-relativity-result').val('');
+		});
+	}
+	
+	function setUpPrimeFactorsListeners() {
+		$('#prime-factors-calculate-button').click(function(event) {
+			const n = Number($('#prime-factors-n').val());
+			
+			const primeFactors = getPrimeFactors(n);
+			
+			const p = primeFactors[0];
+			const q = primeFactors[1];
+			
+			$('#prime-factors-result').val('(' + p + ',' + q + ')');
+		});
+		
+		$('#prime-factors-reset-button').click(function(event) {
+			$('#prime-factors-n').val('');
+			$('#prime-factors-result').val('');
+		});
+	}
+	
+	function setUpIsPrimeListeners() {
+		$('#is-prime-calculate-button').click(function(event) {
+			const x = Number($('#is-prime-x').val());
+			
+			$('#is-prime-result').val('...please wait...');
+			const isPrimeResult = isPrime(x);
+			$('#is-prime-result').val(isPrimeResult);
+		});
+		
+		$('#is-prime-reset-button').click(function(event) {
+			$('#is-prime-x').val('');
+			$('#is-prime-result').val('');
+		});
+	}
+	
+	function setUpIsDAndEValidListeners() {
+		$('#is-d-and-e-valid-calculate-button').click(function(event) {
+			const d = Number($('#is-d-and-e-valid-d').val());
+			const e = Number($('#is-d-and-e-valid-e').val());
+			const phi_n = Number($('#is-d-and-e-valid-phi-n').val());
+			
+			const d_multiplied_e = d * e;
+			
+			$('#is-d-and-e-valid-result').val(((d_multiplied_e % phi_n) === 1));
+		});
+		
+		$('#is-d-and-e-valid-reset-button').click(function(event) {
+			$('#is-d-and-e-valid-d').val('');
+			$('#is-d-and-e-valid-e').val('');
+			$('#is-d-and-e-valid-phi-n').val('');
+			$('#is-d-and-e-valid-result').val('');
+		});
+	}
+	
+	function setUpNFromPqListeners() {
+		$('#n-from-pq-calculate-button').click(function(event) {
+			const p = Number($('#n-from-pq-p').val());
+			const q = Number($('#n-from-pq-q').val());
+			
+			const n = p * q;
+			
+			$('#n-from-pq-result').val(n);
+		});
+		
+		$('#n-from-pq-reset-button').click(function(event) {
+			$('#n-from-pq-p').val('');
+			$('#n-from-pq-q').val('');
+			$('#n-from-pq-result').val('');
+		});
+	}
+	
+	function setUpEncryptionKeyFromPqListeners() {
+		$('#encryption-key-calculate-button').click(function(event) {
+			const p = Number($('#encryption-key-p').val());
+			const q = Number($('#encryption-key-q').val());
+			
+			const eulersTotient = getEulersTotient(p, q);
+			const e = getSmallestRelativePrime(eulersTotient);
+			
+			if(e != null) {
+				$('#encryption-key-result').val(e);
+			}
+			else {
+				showAlert('could not find a prime number for that (p,q) pair.');
+			}
+		});
+		
+		$('#encryption-key-reset-button').click(function(event) {
+			$('#encryption-key-p').val('');
+			$('#encryption-key-q').val('');
+			$('#encryption-key-result').val('');
+		});
+	}
+	
+	function setUpPublicKeyFromPqeListeners() {
+		$('#public-key-calculate-button').click(function(event) {
+			const p = Number($('#public-key-p').val());
+			const q = Number($('#public-key-q').val());
+			const e = Number($('#public-key-e').val());
+			
+			$('#public-key-result').val('...please wait...');
+			
+			const isPrimeResult = isPrime(e);
+			
+			if(isPrimeResult) {
+				const N = p * q;
+				
+				$('#public-key-result').val('(' + N + ',' + e + ')');
+			}
+			else {
+				showAlert('e is not a prime number.');
+			}
+		});
+		
+		$('#public-key-reset-button').click(function(event) {
+			$('#public-key-p').val('');
+			$('#public-key-q').val('');
+			$('#public-key-e').val('');
+			$('#public-key-result').val('');
+		});
+	}
+	
+	function setUpPrivateKeyFromPqeListeners() {
+		$('#private-key-calculate-button').click(function(event) {
+			const p = Number($('#private-key-p').val());
+			const q = Number($('#private-key-q').val());
+			const e = Number($('#private-key-e').val());
+			
+			$('#private-key-result').val('...please wait...');
+			
+			const isPrimeResult = isPrime(e);
+			
+			if(isPrimeResult) {
+				const N = p * q;
+				
+				const eulersTotient = getEulersTotient(p, q);
+				const d = calculateModularInverse(e, eulersTotient);
+				
+				$('#private-key-result').val('(' + N + ',' + d + ')');
+			}
+			else {
+				showAlert('e is not a prime number.');
+			}
+		});
+		
+		$('#private-key-reset-button').click(function(event) {
+			$('#private-key-p').val('');
+			$('#private-key-q').val('');
+			$('#private-key-e').val('');
+			$('#private-key-result').val('');
+		});
+	}
+	
+	function setUpPublicKeyToPrivateKeyListeners() {
+		$('#public-key-to-private-key-calculate-button').click(function(event) {
+			const n = Number($('#public-key-to-private-key-n').val());
+			const e = Number($('#public-key-to-private-key-e').val());
+			
+			const primeFactors = getPrimeFactors(n);
+			
+			const p = primeFactors[0];
+			const q = primeFactors[1];
+			
+			const eulersTotient = getEulersTotient(p, q);
+			
+			const d = calculateModularInverse(e, eulersTotient);
+			
+			$('#public-key-to-private-key-result').val(d);
+		});
+		
+		$('#public-key-to-private-key-reset-button').click(function(event) {
+			$('#public-key-to-private-key-n').val('');
+			$('#public-key-to-private-key-e').val('');
+			$('#public-key-to-private-key-result').val('');
+		});
+	}
+	
+	function setUpEncryptMessageListeners() {
+		$('#encrypt-message-calculate-button').click(function(event) {
+			const m = Number($('#encrypt-message-m').val());
+			const e = Number($('#encrypt-message-e').val());
+			const n = Number($('#encrypt-message-n').val());
+			
+			const modularExponentiationResult = modularExponentiation(m, e, n);
+			
+			$('#encrypt-message-result').val(modularExponentiationResult);
+		});
+		
+		$('#encrypt-message-reset-button').click(function(event) {
+			$('#encrypt-message-m').val('');
+			$('#encrypt-message-e').val('');
+			$('#encrypt-message-n').val('');
+			$('#encrypt-message-result').val('');
+		});
+	}
+	
+	function setUpDecryptMessageListeners() {
+		$('#decrypt-message-calculate-button').click(function(event) {
+			const y = Number($('#decrypt-message-y').val());
+			const d = Number($('#decrypt-message-d').val());
+			const n = Number($('#decrypt-message-n').val());
+			
+			const modularExponentiationResult = modularExponentiation(y, d, n);
+			
+			$('#decrypt-message-result').val(modularExponentiationResult);
+		});
+		
+		$('#decrypt-message-reset-button').click(function(event) {
+			$('#decrypt-message-y').val('');
+			$('#decrypt-message-d').val('');
+			$('#decrypt-message-n').val('');
+			$('#decrypt-message-result').val('');
+		});
+	}
+
+
+
+
+
+
+	// Euclidean Algorithm
+	function gcd(a, b) {
+		if (b === 0) {
+			return a;
+		}
+		
+		return gcd(b, a % b);
+	}
+	
+	// Extended Euclidean Algorithm
+	function extendedGCD(a, b) {
+		if (b === 0) {
+			return [1, 0, a];
+		}
+		
+		let [x1, y1, d] = extendedGCD(b, a % b);
+		let x = y1;
+		let y = x1 - Math.floor(a / b) * y1;
+		
+		return [x, y, d];
+	}
+	
+	// e^(y) mod N
+	// exponentiation by squaring, fast, O(log(y)) time complexity
+	function modularExponentiation(base, exponent, modulus) {
+		if (modulus === 1)
+			return 0;
+		
+		base = base % modulus;
+		
+		let result = 1;
+		
+		while (exponent > 0) {
+			if (exponent % 2 === 1)
+				result = (result * base) % modulus;
+				
+			exponent = exponent >> 1;
+			
+			base = (base * base) % modulus;
+		}
+		
+		return result;
+	}
+	
+	function getEulersTotient(p, q) {
+		const eulersTotient = (p - 1) * (q - 1);
+		
+		return eulersTotient;
+	}
+	
+	// e^(-1) mod ϕ(N)
+	function calculateModularInverse(e, eulersTotient) {
+		let [x, y, d] = extendedGCD(e, eulersTotient);
+		
+		if (d !== 1) {
+			throw "No inverse exists (the numbers are not coprime)";
+		}
+		return (x + eulersTotient) % eulersTotient;
+	}
+
+	// general purpose prime factorization algorithm
+	// Trial Division for small numbers with Pollard's Rho fallback for large numbers
+	function getPrimeFactors(n) {
+		let factors = [];
+		
+		while (n % 2 === 0) {
+			factors.push(2);
+			n /= 2;
+		}
+		
+		while (n % 3 === 0) {
+			factors.push(3);
+			n /= 3;
+		}
+
+		// Trial Division for smaller numbers up to squareRoot(n)
+		for (let i = 5; i * i <= n; i += 6) {
+			while (n % i === 0) {
+				factors.push(i);
+				n /= i;
+			}
+			while (n % (i + 2) === 0) {
+				factors.push(i + 2);
+				n /= i + 2;
+			}
+		}
+
+		// Pollard's Rho fallback if n is too large for Trial Division
+		if (n > 2) {
+			let x = Math.floor(Math.random() * (n - 2)) + 2;
+			let y = x;
+			let c = Math.floor(Math.random() * (n - 1)) + 1;
+			let d = 1;
+		
+			while (d === 1) {
+				x = (x * x + c) % n;
+				y = (y * y + c) % n;
+				y = (y * y + c) % n;
+				
+				d = gcd(Math.abs(x - y), n);
+			}
+			
+			d = d === n ? undefined : d;
+			
+			if (d) {
+				factors.push(...getPrimeFactors(d));
+				factors.push(...getPrimeFactors(n / d));
+			} else {
+				factors.push(n);
+			}
+		}
+
+		return factors;
+	}
+	
+	// discover a value e that is relatively prime to N
+	// gcd(N,e) === 1
+	function getSmallestRelativePrime(N) {
+		let e = 2;
+		
+		while(gcd(N, e) !== 1 && e < N) {
+			e++;
+		}
+		
+		if (e < N) {
+			return e;
+		} else {
+			return null;
+		}
+	}
+	
+	// checks if n is prime
+	// uses Trial Division, O(squareRoot(n)) time complexity
+	// not a probabilistic algorithm; it is deterministic, so no false positives
+	// you gain performance when using probabalistic algorithms, but that's in consideration towards very large numbers
+	function isPrime(n) {
+		if (n <= 1) {
+			return false;
+		}
+		else if (n <= 3) {
+			return true;
+		}
+		else if (n % 2 === 0 || n % 3 === 0) {
+			return false;
+		}
+		else {
+			let i = 5;
+			
+			while (i * i <= n) {
+				if (n % i === 0 || n % (i + 2) === 0) {
+					return false;
+				}
+				
+				i += 6;
+			}
+			
+			return true;
+		}
+	}
+	
+	function showAlert(message) {
+		Swal.fire({
+			icon: 'error',
+			title: 'Oops',
+			text: message,
+			confirmButtonText: 'close',
+			showConfirmButton: true
+		});
+	}
+</script>
+</html>
