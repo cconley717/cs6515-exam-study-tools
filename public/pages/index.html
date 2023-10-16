@@ -718,9 +718,11 @@
 		let [x, y, d] = extendedGCD(e, eulersTotient);
 		
 		if (d !== 1) {
-			throw "No inverse exists (the numbers are not coprime)";
+			showAlert('No inverse exists (the numbers are not coprime)');
 		}
-		return (x + eulersTotient) % eulersTotient;
+		else {
+			return (x + eulersTotient) % eulersTotient;
+		}
 	}
 
 	// general purpose prime factorization algorithm
