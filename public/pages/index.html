@@ -451,19 +451,26 @@
 		$('#prime-factors-calculate-button').click(function(event) {
 			const n = Number($('#prime-factors-n').val());
 			
-			const primeFactors = getPrimeFactors(n);
-			
-			var output = '(';
-			
-			for(var primeFactor of primeFactors) {
-				output += primeFactor + ',';
+			if(n > 0) {
+				const primeFactors = getPrimeFactors(n);
+				
+				var output = '(';
+				
+				for(var primeFactor of primeFactors) {
+					output += primeFactor + ',';
+				}
+				
+				if(output.length > 1) {
+					output = output.slice(0, output.length - 1);
+				}
+				
+				output += ')';
+				
+				$('#prime-factors-result').val(output);
 			}
-			
-			output = output.slice(0, output.length - 1);
-			
-			output += ')';
-			
-			$('#prime-factors-result').val(output);
+			else {
+				$('#prime-factors-result').val('()');
+			}
 		});
 		
 		$('#prime-factors-reset-button').click(function(event) {
