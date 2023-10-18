@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap-5.3.2.min.css" rel="stylesheet">
+    <title>CS6515 - Graph Algorithms - Floyd-Warshall</title>
+</head>
+<body>
+    <script src="/javascript/bootstrap-5.3.2.bundle.min.js"></script>
+    <script src="/javascript/jquery-3.6.4.min.js"></script>
+	<script src="/javascript/sweet-alert-2-11.7.32.js"></script>
+</body>
+<script>
+	$(document).ready(function() {
+		showGraphInitializationPrompt();
+	});
+	
+	class Graph {
+		constructor(vertices, isDirected = false) {
+			this.vertices = vertices;
+			this.isDirected = isDirected;
+			
+			this.INF = 99999;
+			
+			this.distanceMatrix = Array.from({ length: vertices }, () => Array.from({ length: vertices }, () => this.INF));
+			
+			for (let i = 0; i < vertices; i++) {
+				this.distanceMatrix[i][i] = 0;
+			}
+		}
+
+		addEdge(from, to, weight) {
+			this.distanceMatrix[from][to] = weight;
+			
+			if(!this.isDirected) {
+				this.distanceMatrix[to][from] = weight;
+			}
+		}
+
+		floydWarshall() {
+			this.outputAdjacencyMatrix('Graph Initial State', this.distanceMatrix);
+			
+			var i, j, k;
+			
+			var dist = Array.from(Array(this.vertices), () => new Array(this.vertices).fill(0));
+			
+			for (i = 0; i < this.vertices; i++) {
+				for (j = 0; j < this.vertices; j++) {
+					dist[i][j] = this.distanceMatrix[i][j];
+				}
+			}
+			
+			for (k = 0; k < this.vertices; k++) {
+				for (i = 0; i < this.vertices; i++) {
+					for (j = 0; j < this.vertices; j++) {
+						if (dist[i][k] + dist[k][j] < dist[i][j]) {
+							dist[i][j] = dist[i][k] + dist[k][j];
+						}
+					}
+				}
+			}
+			
+			this.outputAdjacencyMatrix('Graph Shortest Paths', dist);
+		}
+		
+		outputAdjacencyMatrix(text, dist) {
+			let table = $('<table></table>').addClass('table');
+
+			let caption = $('<caption>' + text + '</caption>').addClass('caption-top');
+			table.append(caption);
+			
+			let tableHeaderHtml = '<thead><tr><th></th>';
+			
+			for(var i = 0; i < dist.length; i++) {
+				tableHeaderHtml+= '<th>' + i + '</th>';
+			}
+			
+			tableHeaderHtml += '</tr></thead>';
+
+			let tableHeader = $(tableHeaderHtml).addClass('table-light');
+			table.append(tableHeader);
+			
+			let tableBody = $('<tbody></tbody>').addClass('table-group-divider');
+			
+			for (var i = 0; i < this.vertices; ++i) {
+				let tableRow = $('<tr></tr>');
+				tableRow.append($('<td>' + i + '</td>'));
+				
+				for (var j = 0; j < this.vertices; ++j) {
+					if (dist[i][j] == this.INF) {
+						tableRow.append($('<td>INF</td>'));
+					} else {
+						tableRow.append($('<td>' + dist[i][j] + '</td>'));
+					}
+				}
+				
+				tableBody.append(tableRow);
+			}
+			
+			table.append(tableBody);
+
+			$('body').append(table);
+		}
+	}
+	
+	function showGraphInitializationPrompt() {
+		Swal.fire({
+			title: "Vertices and Edges?",
+			html: '\
+			<div class="input-group mb-3"><input id="verticesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="vertices count"/></div> \
+			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div> \
+			<div class="form-check form-switch d-flex justify-content-center"> <input id="isDirectedGraphSwitch" class="form-check-input me-3" type="checkbox" role="switch"> <label class="form-check-label" for="isDirectedGraphSwitch">is a directed graph</label> </div>',
+			showCancelButton: false,
+			confirmButtonText: 'next',
+			preConfirm: () => {
+				const verticesCount = Number(Swal.getPopup().querySelector('#verticesCountInput').value);
+				const edgesCount = Number(Swal.getPopup().querySelector('#edgesCountInput').value);
+				const isDirectedgraph = Swal.getPopup().querySelector('#isDirectedGraphSwitch').checked;
+				
+				return { verticesCount: verticesCount, edgesCount: edgesCount, isDirectedgraph: isDirectedgraph }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const verticesCount = result.value.verticesCount;
+				const edgesCount = result.value.edgesCount;
+				const isDirectedgraph = result.value.isDirectedgraph;
+				
+				showGraphEdgesPrompt(verticesCount, edgesCount, isDirectedgraph);
+			}
+		});
+	}
+	
+	function showGraphEdgesPrompt(verticesCount, edgesCount, isDirectedgraph) {
+		let html = '<div class="container mt-5">';
+		
+		for(var i = 0; i < edgesCount; i++) {
+			html += '<div class="row mt-3">';
+			
+			let fromOptions = '';
+			let toOptions = '';
+			for(var j = 0; j < verticesCount; j++) {
+				fromOptions += '<option value="' + j + '">' + j + '</option>';
+				toOptions += '<option value="' + j + '">' + j + '</option>';
+			}
+			
+			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> <div class="col"> <input id="edge-weight-'+i+'" class="form-control" placeholder="weight" /> </div></div>';
+		}
+		
+		html += '</div>'
+		
+		Swal.fire({
+			title: "Edges and Weights",
+			html: html,
+			showCancelButton: false,
+			confirmButtonText: 'run',
+			preConfirm: () => {
+				let edges = [];
+				
+				for(let i = 0; i < edgesCount; i++) {
+					const from = Number(Swal.getPopup().querySelector('#edge-from-' + i).value);
+					const to = Number(Swal.getPopup().querySelector('#edge-to-' + i).value);
+					const weight = Number(Swal.getPopup().querySelector('#edge-weight-' + i).value);
+					
+					let edge = {from: from, to: to, weight: weight};
+					
+					edges.push(edge);
+				}
+				
+				return { verticesCount: verticesCount, edges: edges }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const verticesCount = result.value.verticesCount;
+				const edges = result.value.edges;
+				
+				const graph = new Graph(verticesCount, isDirectedgraph);
+				
+				for(let i = 0; i < edges.length; i++) {
+					const edge = edges[i];
+					
+					graph.addEdge(edge.from, edge.to, edge.weight);
+				}
+				
+				graph.floydWarshall();
+			}
+		});
+	}
+	
+	function showAlert(message) {
+		Swal.fire({
+			icon: 'error',
+			title: 'Oops',
+			text: message,
+			confirmButtonText: 'close',
+			showConfirmButton: true
+		});
+	}
+</script>
+</html>
