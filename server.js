@@ -48,12 +48,8 @@ app.get('/graph-algorithms/kruskal', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/pages', 'kruskal.html'));
 });
 
-app.get('/graph-algorithms/ford-fulkerson', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'ford-fulkerson.html'));
-});
-
-app.get('/graph-algorithms/edmonds-karp', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'edmonds-karp.html'));
+app.get('/graph-algorithms/max-flow', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages', 'max-flow.html'));
 });
 
 app.get('/graph-algorithms/scc', (req, res) => {

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap-5.3.2.min.css" rel="stylesheet">
+    <title>CS6515 - Graph Algorithms - Floyd-Warshall</title>
+</head>
+<body>
+    <script src="/javascript/bootstrap-5.3.2.bundle.min.js"></script>
+    <script src="/javascript/jquery-3.6.4.min.js"></script>
+	<script src="/javascript/sweet-alert-2-11.7.32.js"></script>
+</body>
+<script>
+	$(document).ready(function() {
+		showGraphInitializationPrompt();
+	});
+	
+	class Graph {
+		constructor(vertices) {
+			this.vertices = vertices;
+			
+			this.distanceMatrix = Array.from({length: vertices}, () => Array.from({length: vertices}, () => 0));
+		}
+		
+		addEdge(from, to, weight) {
+			this.distanceMatrix[from][to] = weight;
+		}
+		
+		bfs(residualGraph, s, t, parent) {
+			let visited = new Array(this.vertices);
+			
+			for (let i = 0; i < this.vertices; ++i) {
+				visited[i] = false;
+			}
+			
+			let queue = [];
+			queue.push(s);
+			visited[s] = true;
+			parent[s] = -1;
+
+			while (queue.length != 0) {
+				let u = queue.shift();
+
+				for (let v = 0; v < this.vertices; v++) {
+					if (visited[v] == false && residualGraph[u][v] > 0) {
+						if (v == t) {
+							parent[v] = u;
+							return true;
+						}
+						
+						queue.push(v);
+						parent[v] = u;
+						visited[v] = true;
+					}
+				}
+			}
+			
+			return false;
+		}
+		
+		fordFulkerson(s, t) {
+			let u, v;
+			
+			let residualGraph = new Array(this.vertices);
+
+			for (u = 0; u < this.vertices; u++) {
+				residualGraph[u] = new Array(this.vertices);
+				
+				for (v = 0; v < this.vertices; v++) {
+					residualGraph[u][v] = this.distanceMatrix[u][v];
+				}
+			}
+
+			let parent = new Array(this.vertices);
+
+			let max_flow = 0;
+
+			while (this.bfs(residualGraph, s, t, parent)) {
+				let path_flow = Number.MAX_VALUE;
+				for (v = t; v != s; v = parent[v]) {
+					u = parent[v];
+					path_flow = Math.min(path_flow, residualGraph[u][v]);
+				}
+
+				for (v = t; v != s; v = parent[v]) {
+					u = parent[v];
+					residualGraph[u][v] -= path_flow;
+					residualGraph[v][u] += path_flow;
+				}
+
+				max_flow += path_flow;
+			}
+			
+			this.outputAdjacencyMatrix('Original Graph (edge capacities)', this.distanceMatrix);
+			this.outputAdjacencyMatrix('Residual Graph (forward edges are remaining capacities, backward edges are flows)', residualGraph);
+			
+			$('body').append('The maximum flow is: ' + max_flow);
+		}
+		
+		outputAdjacencyMatrix(text, dist) {
+			let table = $('<table></table>').addClass('table');
+
+			let caption = $('<caption>' + text + '</caption>').addClass('caption-top');
+			table.append(caption);
+			
+			let tableHeaderHtml = '<thead><tr><th>(from &#8595, to &#8594)</th>';
+			
+			for(var i = 0; i < dist.length; i++) {
+				tableHeaderHtml+= '<th>' + i + '</th>';
+			}
+			
+			tableHeaderHtml += '</tr></thead>';
+
+			let tableHeader = $(tableHeaderHtml).addClass('table-light');
+			table.append(tableHeader);
+			
+			let tableBody = $('<tbody></tbody>').addClass('table-group-divider');
+			
+			for (var i = 0; i < this.vertices; ++i) {
+				let tableRow = $('<tr></tr>');
+				tableRow.append($('<td>' + i + '</td>'));
+				
+				for (var j = 0; j < this.vertices; ++j) {
+					if (dist[i][j] == this.INF) {
+						tableRow.append($('<td>INF</td>'));
+					} else {
+						tableRow.append($('<td>' + dist[i][j] + '</td>'));
+					}
+				}
+				
+				tableBody.append(tableRow);
+			}
+			
+			table.append(tableBody);
+
+			$('body').append(table);
+		}
+	}
+	
+	function showGraphInitializationPrompt() {
+		Swal.fire({
+			title: "Vertices and Edges?",
+			html: '\
+			<div class="input-group mb-3"><input id="verticesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="vertices count"/></div> \
+			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div>',
+			showCancelButton: false,
+			confirmButtonText: 'next',
+			preConfirm: () => {
+				const verticesCount = Number(Swal.getPopup().querySelector('#verticesCountInput').value);
+				const edgesCount = Number(Swal.getPopup().querySelector('#edgesCountInput').value);
+				
+				return { verticesCount: verticesCount, edgesCount: edgesCount }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const verticesCount = result.value.verticesCount;
+				const edgesCount = result.value.edgesCount;
+				
+				showGraphEdgesPrompt(verticesCount, edgesCount);
+			}
+		});
+	}
+	
+	function showGraphEdgesPrompt(verticesCount, edgesCount) {
+		let html = '<div class="container mt-5">';
+		
+		for(var i = 0; i < edgesCount; i++) {
+			html += '<div class="row mt-3">';
+			
+			let fromOptions = '';
+			let toOptions = '';
+			for(var j = 0; j < verticesCount; j++) {
+				fromOptions += '<option value="' + j + '">' + j + '</option>';
+				toOptions += '<option value="' + j + '">' + j + '</option>';
+			}
+			
+			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> <div class="col"> <input id="edge-capacity-'+i+'" class="form-control" placeholder="capacity" /> </div></div>';
+		}
+		
+		html += '</div>'
+		
+		Swal.fire({
+			title: "Edges and Capacities",
+			html: html,
+			showCancelButton: false,
+			confirmButtonText: 'run',
+			preConfirm: () => {
+				let edges = [];
+				
+				for(let i = 0; i < edgesCount; i++) {
+					const from = Number(Swal.getPopup().querySelector('#edge-from-' + i).value);
+					const to = Number(Swal.getPopup().querySelector('#edge-to-' + i).value);
+					const capacity = Number(Swal.getPopup().querySelector('#edge-capacity-' + i).value);
+					
+					let edge = {from: from, to: to, capacity: capacity};
+					
+					edges.push(edge);
+				}
+				
+				return { verticesCount: verticesCount, edges: edges }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const verticesCount = result.value.verticesCount;
+				const edges = result.value.edges;
+				
+				const graph = new Graph(verticesCount);
+				
+				for(let i = 0; i < edges.length; i++) {
+					const edge = edges[i];
+					
+					graph.addEdge(edge.from, edge.to, edge.capacity);
+				}
+				
+				showGraphStartAndEndVertexPrompt(graph, verticesCount);
+			}
+		});
+	}
+	
+	function showGraphStartAndEndVertexPrompt(graph, verticesCount) {
+		let html = '<div class="container"><div class="row mt-3">';
+		
+		let vertexOptions = '';
+		for(var i = 0; i < verticesCount; i++) {
+			vertexOptions += '<option value="' + i + '">' + i + '</option>';
+		}
+		
+		html += '<div class="col"> <select id="starting-vertex" class="form-select">' + vertexOptions + '</select> </div> <div class="col"> <select id="ending-vertex" class="form-select">' + vertexOptions + '</select> </div>';
+		
+		html += '</div>';
+		
+		Swal.fire({
+			title: "S and T vertices",
+			html: html,
+			showCancelButton: false,
+			confirmButtonText: 'run',
+			preConfirm: () => {
+				let startingVertex = Number(Swal.getPopup().querySelector('#starting-vertex').value);
+				let endingVertex = Number(Swal.getPopup().querySelector('#ending-vertex').value);
+				
+				return { startingVertex: startingVertex, endingVertex: endingVertex }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const startingVertex = result.value.startingVertex;
+				const endingVertex = result.value.endingVertex;
+				
+				graph.fordFulkerson(startingVertex, endingVertex);
+			}
+		});
+	}
+	
+	function showAlert(message) {
+		Swal.fire({
+			icon: 'error',
+			title: 'Oops',
+			text: message,
+			confirmButtonText: 'close',
+			showConfirmButton: true
+		});
+	}
+</script>
+</html>
