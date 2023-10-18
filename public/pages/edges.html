@@ -18,68 +18,55 @@
 	
 	class Graph {
 		constructor(v) {
-			this.V = v; 
-			this.adj = new Array(v);
-		   
-			for(let i = 0; i < v; ++i) {
-				this.adj[i] = [];
-			}
+			this.v = v;
 			
-			this.Time = 0;
+			this.time = 0;
+			this.traversalArray = [];
+			
+			this.graphList = new Array(v).fill(0).map(() => []);
 		}
 		
-		addEdge(v, w) {
-			this.adj[v].push(w); 
+		addEdge(from, to) {
+			this.graphList[from].push(to);
 		}
-		
-		SCCUtil(u, low, disc, stackMember, st) {
-			disc[u] = this.Time; 
-			low[u] = this.Time; 
-			this.Time += 1;
-			stackMember[u] = true;
-			st.push(u);
-		   
-			let n;
-			
-			for(let i of this.adj[u]) { 
-				n = i; 
-				   
-				if (disc[n] == -1) {
-					this.SCCUtil(n, low, disc, stackMember, st);
-					low[u] = Math.min(low[u], low[n]);
+
+		printEdgeTypes() {
+			this.visited = new Array(this.v).fill(false);
+			this.startTime = new Array(this.v).fill(0);
+			this.endTime = new Array(this.v).fill(0);
+
+			for (let node = 0; node < this.v; node++) {
+				if (!this.visited[node]) {
+					this.traverseDfs(node);
 				}
-				else if (stackMember[n] == true) {
-					low[u] = Math.min(low[u], disc[n]);
-				}
-			} 
-		   
-			let w = -1; 
-			if (low[u] == disc[u]) {
-				while (w != u) { 
-					w = st.pop();
-					document.write(w + " ");
-					stackMember[w] = false;
-				}
-				document.write("<br>"); 
 			}
 		}
-			 
-		SCC() {
-			let disc = new Array(this.V); 
-			let low = new Array(this.V); 
-			
-			for(let i = 0;i < this.V; i++) {
-				disc[i] = -1;
-				low[i] = -1;
-			}
-			   
-			let stackMember = new Array(this.V); 
-			let st = [];
-			   
-			for(let i = 0; i < this.V; i++) {
-				if (disc[i] == -1) {
-					this.SCCUtil(i, low, disc, stackMember, st);
+
+		traverseDfs(node) {
+			this.visited[node] = true;
+			this.traversalArray.push(node);
+			this.startTime[node] = this.time;
+			this.time++;
+
+			for (let neighbour of this.graphList[node]) {
+				if (!this.visited[neighbour]) {
+					document.write('Tree Edge: ', `${node} to ${neighbour}`); 
+					document.write('<br>');
+					this.traverseDfs(neighbour);
+				} else {
+					if (this.startTime[node] > this.startTime[neighbour] && this.endTime[node] < this.endTime[neighbour]) {
+						document.write('Back Edge: ', `${node} to ${neighbour}`);
+						document.write('<br>');
+					} else if (this.startTime[node] < this.startTime[neighbour] && this.endTime[node] > this.endTime[neighbour]) {
+						document.write('Forward Edge: ', `${node} to ${neighbour}`);
+						document.write('<br>');
+					} else if (this.startTime[node] > this.startTime[neighbour] && this.endTime[node] > this.endTime[neighbour]) {
+						document.write('Cross Edge: ', `${node} to ${neighbour}`);
+						document.write('<br>');
+					}
 				}
+				this.endTime[node] = this.time;
+				this.time++;
 			}
 		}
 	}
@@ -160,7 +147,7 @@
 					graph.addEdge(edge.from, edge.to);
 				}
 				
-				graph.SCC();
+				graph.printEdgeTypes();
 			}
 		});
 	}

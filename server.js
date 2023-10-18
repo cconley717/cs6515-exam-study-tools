@@ -60,6 +60,10 @@ app.get('/graph-algorithms/scc', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/pages', 'scc.html'));
 });
 
+app.get('/graph-algorithms/edges', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages', 'edges.html'));
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
 });
