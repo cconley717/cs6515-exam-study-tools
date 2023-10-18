@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap-5.3.2.min.css" rel="stylesheet">
+    <title>CS6515 - Graph Algorithms - Kruskal</title>
+</head>
+<body>
+    <script src="/javascript/bootstrap-5.3.2.bundle.min.js"></script>
+    <script src="/javascript/jquery-3.6.4.min.js"></script>
+	<script src="/javascript/sweet-alert-2-11.7.32.js"></script>
+</body>
+<script>
+	$(document).ready(function() {
+		showGraphInitializationPrompt();
+	});
+	
+	class Graph {
+		constructor(vertices) {
+			this.vertices = vertices;
+			this.graph = [];
+		}
+		
+		addEdge(src, dest, weight) {
+			this.graph.push([src, dest, weight]);
+		}
+		
+		makeSet(parent,rank,n) { 
+			for(let i=0;i<n;i++) { 
+				parent[i]=i; 
+				rank[i]=0; 
+			} 
+		} 
+		
+		findParent(parent,component) { 
+			if(parent[component]==component) 
+				return component; 
+		
+			return parent[component] = this.findParent(parent,parent[component]); 
+		} 
+		
+		unionSet(u, v, parent, rank,n) {
+			u=this.findParent(parent,u); 
+			v=this.findParent(parent,v); 
+		
+			if(rank[u]<rank[v]) { 
+				parent[u]=v; 
+			} 
+			else if(rank[u]<rank[v]) { 
+				parent[v]=u; 
+			} 
+			else { 
+				parent[v]=u; 
+				rank[u]++;
+			} 
+		} 
+		
+		kruskal() { 
+			this.graph.sort((a, b)=>{ 
+				return a[2] - b[2]; 
+			}) 
+			
+			let parent = new Array(this.vertices); 
+			let rank = new Array(this.vertices); 
+		
+			this.makeSet(parent,rank,this.vertices);
+			
+			let mst = [];
+			
+			for(let i = 0; i < this.graph.length; i++) { 
+				let v1=this.findParent(parent,this.graph[i][0]); 
+				let v2=this.findParent(parent,this.graph[i][1]); 
+				let wt=this.graph[i][2]; 
+
+				if(v1!=v2) { 
+					this.unionSet(v1,v2,parent,rank,this.vertices); 
+					
+					mst.push({from: this.graph[i][0], to: this.graph[i][1], weight: wt});
+				}
+			}
+			
+			let cost = 0;
+			
+			for(const edge of mst) {
+				cost += edge.weight;
+			}
+			
+			return {mst: mst, cost: cost};
+		}
+	}
+	
+	function showGraphInitializationPrompt() {
+		Swal.fire({
+			title: "Vertices and Edges?",
+			html: '\
+			<div class="input-group mb-3"><input id="verticesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="vertices count"/></div> \
+			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div>',
+			showCancelButton: false,
+			confirmButtonText: 'next',
+			preConfirm: () => {
+				const verticesCount = Number(Swal.getPopup().querySelector('#verticesCountInput').value);
+				const edgesCount = Number(Swal.getPopup().querySelector('#edgesCountInput').value);
+				
+				return { verticesCount: verticesCount, edgesCount: edgesCount }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const verticesCount = result.value.verticesCount;
+				const edgesCount = result.value.edgesCount;
+				
+				showGraphEdgesPrompt(verticesCount, edgesCount);
+			}
+		});
+	}
+	
+	function showGraphEdgesPrompt(verticesCount, edgesCount) {
+		let html = '<div class="container mt-5">';
+		
+		for(var i = 0; i < edgesCount; i++) {
+			html += '<div class="row mt-3">';
+			
+			let fromOptions = '';
+			let toOptions = '';
+			for(var j = 0; j < verticesCount; j++) {
+				fromOptions += '<option value="' + j + '">' + j + '</option>';
+				toOptions += '<option value="' + j + '">' + j + '</option>';
+			}
+			
+			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> <div class="col"> <input id="edge-weight-'+i+'" class="form-control" placeholder="weight" /> </div></div>';
+		}
+		
+		html += '</div>'
+		
+		Swal.fire({
+			title: "Edges and Weights",
+			html: html,
+			showCancelButton: false,
+			confirmButtonText: 'run',
+			preConfirm: () => {
+				let edges = [];
+				
+				for(let i = 0; i < edgesCount; i++) {
+					const from = Number(Swal.getPopup().querySelector('#edge-from-' + i).value);
+					const to = Number(Swal.getPopup().querySelector('#edge-to-' + i).value);
+					const weight = Number(Swal.getPopup().querySelector('#edge-weight-' + i).value);
+					
+					let edge = {from: from, to: to, weight: weight};
+					
+					edges.push(edge);
+				}
+				
+				return { verticesCount: verticesCount, edges: edges }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const verticesCount = result.value.verticesCount;
+				const edges = result.value.edges;
+				
+				const graph = new Graph(verticesCount);
+				
+				for(let i = 0; i < edges.length; i++) {
+					const edge = edges[i];
+					
+					graph.addEdge(edge.from, edge.to, edge.weight);
+				}
+				
+				const traversalResults = graph.kruskal();
+				
+				const mst = traversalResults.mst;
+				const cost = traversalResults.cost;
+				
+				let table = $('<table></table>').addClass('table');
+
+				let caption = $('<caption>Cost: ' + cost + '</caption>').addClass('caption-top');
+				table.append(caption);
+
+				let tableHeader = $('<thead><tr><th>from</th><th>to</th><th>weight</th></tr></thead>').addClass('table-light');
+				table.append(tableHeader);
+
+				let tableBody = $('<tbody></tbody>').addClass('table-group-divider');
+				
+				for(let edge of mst) {
+					let tableRow = $('<tr></tr>');
+					
+					tableRow.append($('<td>' + edge.from + '</td><td>' + edge.to + '</td><td>' + edge.weight + '</td>'));
+					
+					tableBody.append(tableRow);
+				}
+
+				table.append(tableBody);
+
+				$('body').append(table);
+			}
+		});
+	}
+	
+	function showAlert(message) {
+		Swal.fire({
+			icon: 'error',
+			title: 'Oops',
+			text: message,
+			confirmButtonText: 'close',
+			showConfirmButton: true
+		});
+	}
+</script>
+</html>

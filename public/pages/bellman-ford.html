@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap-5.3.2.min.css" rel="stylesheet">
+    <title>CS6515 - Graph Algorithms - Bellman-Ford</title>
+</head>
+<body>
+    <script src="/javascript/bootstrap-5.3.2.bundle.min.js"></script>
+    <script src="/javascript/jquery-3.6.4.min.js"></script>
+	<script src="/javascript/sweet-alert-2-11.7.32.js"></script>
+</body>
+<script>
+	$(document).ready(function() {
+		showGraphInitializationPrompt();
+	});
+	
+	class Edge {
+		constructor(src, dest, weight) {
+			this.src = src;
+			this.dest = dest;
+			this.weight = weight;
+		}
+	}
+	 
+	class Graph {
+		constructor(V, E) {
+			this.V = V;
+			this.E = E;
+			this.edge = [];
+		}
+	}
+	 
+	function createGraph(V, E) {
+		const graph = new Graph(V, E);
+		
+		for (let i = 0; i < E; i++) {
+			graph.edge[i] = new Edge();
+		}
+		
+		return graph;
+	}
+	 
+	function printArr(dist, V, src, iteration) {
+		let table = $('<table></table>').addClass('table');
+
+		let caption = $('<caption>Iteration: ' + iteration + '</caption>').addClass('caption-top');
+		table.append(caption);
+
+		let tableHeader = $('<thead><tr><th>vertex</th><th>distance from source: ' + src + '</th></tr></thead>').addClass('table-light');
+		table.append(tableHeader);
+
+		let tableBody = $('<tbody></tbody>').addClass('table-group-divider');
+
+		for (let i = 0; i < V; i++) {
+			let tableRow = $('<tr></tr>');
+
+			tableRow.append($('<td>' + i + '</td><td>' + dist[i] + '</td>'));
+
+			tableBody.append(tableRow);
+		}
+
+		table.append(tableBody);
+
+		$('body').append(table);
+	}
+	 
+	function BellmanFord(graph, src) {
+		const V = graph.V;
+		const E = graph.E;
+		const dist = [];
+
+		for (let i = 0; i < V; i++) {
+			dist[i] = Number.MAX_SAFE_INTEGER;
+		}
+		
+		dist[src] = 0;
+
+		for (let i = 1; i <= V - 1; i++) {
+			for (let j = 0; j < E; j++) {
+				const u = graph.edge[j].src;
+				const v = graph.edge[j].dest;
+				const weight = graph.edge[j].weight;
+				
+				if (dist[u] !== Number.MAX_SAFE_INTEGER && dist[u] + weight < dist[v]) {
+					dist[v] = dist[u] + weight;
+				}
+			}
+
+			printArr(dist, V, src, i);
+		}
+
+		for (let i = 0; i < E; i++) {
+			const u = graph.edge[i].src;
+			const v = graph.edge[i].dest;
+			const weight = graph.edge[i].weight;
+			
+			if (dist[u] !== Number.MAX_SAFE_INTEGER && dist[u] + weight < dist[v]) {
+				showAlert("Graph contains negative weight cycle");
+				return;
+			}
+		}
+	}
+	
+	function showGraphInitializationPrompt() {
+		Swal.fire({
+			title: "Vertices and Edges?",
+			html: '\
+			<div class="input-group mb-3"><input id="verticesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="vertices count"/></div> \
+			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div>',
+			showCancelButton: false,
+			confirmButtonText: 'next',
+			preConfirm: () => {
+				const verticesCount = Number(Swal.getPopup().querySelector('#verticesCountInput').value);
+				const edgesCount = Number(Swal.getPopup().querySelector('#edgesCountInput').value);
+				
+				return { verticesCount: verticesCount, edgesCount: edgesCount }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const verticesCount = result.value.verticesCount;
+				const edgesCount = result.value.edgesCount;
+				
+				showGraphEdgesPrompt(verticesCount, edgesCount);
+			}
+		});
+	}
+	
+	function showGraphEdgesPrompt(verticesCount, edgesCount) {
+		let html = '<div class="container mt-5">';
+		
+		for(var i = 0; i < edgesCount; i++) {
+			html += '<div class="row mt-3">';
+			
+			let fromOptions = '';
+			let toOptions = '';
+			for(var j = 0; j < verticesCount; j++) {
+				fromOptions += '<option value="' + j + '">' + j + '</option>';
+				toOptions += '<option value="' + j + '">' + j + '</option>';
+			}
+			
+			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> <div class="col"> <input id="edge-weight-'+i+'" class="form-control" placeholder="weight" /> </div></div>';
+		}
+		
+		html += '</div>'
+		
+		Swal.fire({
+			title: "Edges and Weights",
+			html: html,
+			showCancelButton: false,
+			confirmButtonText: 'next',
+			preConfirm: () => {
+				let edges = [];
+				
+				for(let i = 0; i < edgesCount; i++) {
+					const from = Number(Swal.getPopup().querySelector('#edge-from-' + i).value);
+					const to = Number(Swal.getPopup().querySelector('#edge-to-' + i).value);
+					const weight = Number(Swal.getPopup().querySelector('#edge-weight-' + i).value);
+					
+					let edge = {from: from, to: to, weight: weight};
+					
+					edges.push(edge);
+				}
+				
+				return { verticesCount: verticesCount, edgesCount: edgesCount, edges: edges }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const verticesCount = result.value.verticesCount;
+				const edgesCount = result.value.edgesCount;
+				const edges = result.value.edges;
+				
+				const graph = createGraph(verticesCount, edgesCount);
+				
+				for(let i = 0; i < edges.length; i++) {
+					const edge = edges[i];
+					
+					graph.edge[i] = new Edge(edge.from, edge.to, edge.weight);
+				}
+				
+				showGraphStartVertexPrompt(graph, verticesCount);
+			}
+		});
+	}
+	
+	function showGraphStartVertexPrompt(graph, verticesCount) {
+		let html = '<div class="container"><div class="row mt-3">';
+		
+		let startingVertexOptions = '';
+		for(var i = 0; i < verticesCount; i++) {
+			startingVertexOptions += '<option value="' + i + '">' + i + '</option>';
+		}
+		
+		html += '<div class="col"> <select id="starting-vertex" class="form-select">' + startingVertexOptions + '</select> </div>';
+		
+		html += '</div>';
+		
+		Swal.fire({
+			title: "Starting Vertex",
+			html: html,
+			showCancelButton: false,
+			confirmButtonText: 'run',
+			preConfirm: () => {
+				let startingVertex = Number(Swal.getPopup().querySelector('#starting-vertex').value);
+				
+				return { startingVertex: startingVertex }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const startingVertex = result.value.startingVertex;
+				
+				BellmanFord(graph, startingVertex);
+			}
+		});
+	}
+	
+	function showAlert(message) {
+		Swal.fire({
+			icon: 'error',
+			title: 'Oops',
+			text: message,
+			confirmButtonText: 'close',
+			showConfirmButton: true
+		});
+	}
+</script>
+</html>

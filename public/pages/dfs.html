@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap-5.3.2.min.css" rel="stylesheet">
+    <title>CS6515 - Graph Algorithms - DFS</title>
+</head>
+<body>
+    <script src="/javascript/bootstrap-5.3.2.bundle.min.js"></script>
+    <script src="/javascript/jquery-3.6.4.min.js"></script>
+	<script src="/javascript/sweet-alert-2-11.7.32.js"></script>
+</body>
+<script>
+	$(document).ready(function() {
+		showGraphInitializationPrompt();
+	});
+	
+	class Graph {
+		constructor(isDirected = false) {
+			this.isDirected = isDirected;
+			this.adjacencyList = {};
+		}
+
+		addVertex(vertex) {
+			if (!this.adjacencyList[vertex]) {
+				this.adjacencyList[vertex] = [];
+			}
+		}
+
+		addEdge(v1, v2, weight = 0) {
+			this.adjacencyList[v1].push({ node: v2, weight });
+			
+			if(!this.isDirected) {
+				this.adjacencyList[v2].push({ node: v1, weight });
+			}
+		}
+
+		DFS(start) {
+			const results = [];
+			const visited = {};
+			let orderNum = 1;
+			const traversalOrder = {};
+
+			const DFSVisit = vertex => {
+				visited[vertex] = true;
+				traversalOrder[vertex] = { preorder: orderNum++, postorder: null };
+
+				this.adjacencyList[vertex].forEach(neighbor => {
+					const neighborVertex = neighbor.node;
+					if (!visited[neighborVertex]) {
+						DFSVisit(neighborVertex);
+					}
+				});
+
+				traversalOrder[vertex].postorder = orderNum++;
+			};
+
+			DFSVisit(start);
+
+			for (const vertex in this.adjacencyList) {
+				if (!visited[vertex]) {
+					DFSVisit(vertex);
+				}
+			}
+
+			for (const vertex in traversalOrder) {
+				results.push({vertex: vertex, preorder: traversalOrder[vertex].preorder, postorder: traversalOrder[vertex].postorder});
+			}
+
+			return results;
+		}
+	}
+	
+	function showGraphInitializationPrompt() {
+		Swal.fire({
+			title: "Vertices and Edges?",
+			html: '\
+			<div class="input-group mb-3"><input id="verticesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="vertices count"/></div> \
+			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div> \
+			<div class="form-check form-switch d-flex justify-content-center"> <input id="isDirectedGraphSwitch" class="form-check-input me-3" type="checkbox" role="switch"> <label class="form-check-label" for="isDirectedGraphSwitch">is a directed graph</label> </div>',
+			showCancelButton: false,
+			confirmButtonText: 'next',
+			preConfirm: () => {
+				const verticesCount = Number(Swal.getPopup().querySelector('#verticesCountInput').value);
+				const edgesCount = Number(Swal.getPopup().querySelector('#edgesCountInput').value);
+				const isDirectedgraph = Swal.getPopup().querySelector('#isDirectedGraphSwitch').checked;
+				
+				return { verticesCount: verticesCount, edgesCount: edgesCount, isDirectedgraph: isDirectedgraph }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const verticesCount = result.value.verticesCount;
+				const edgesCount = result.value.edgesCount;
+				const isDirectedgraph = result.value.isDirectedgraph;
+				
+				showGraphEdgesPrompt(verticesCount, edgesCount, isDirectedgraph);
+			}
+		});
+	}
+	
+	function showGraphEdgesPrompt(verticesCount, edgesCount, isDirectedgraph) {
+		let html = '<div class="container mt-5">';
+		
+		for(var i = 0; i < edgesCount; i++) {
+			html += '<div class="row mt-3">';
+			
+			let fromOptions = '';
+			let toOptions = '';
+			for(var j = 0; j < verticesCount; j++) {
+				fromOptions += '<option value="' + j + '">' + j + '</option>';
+				toOptions += '<option value="' + j + '">' + j + '</option>';
+			}
+			
+			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> </div>';
+		}
+		
+		html += '</div>'
+		
+		Swal.fire({
+			title: "Edges and Weights",
+			html: html,
+			showCancelButton: false,
+			confirmButtonText: 'next',
+			preConfirm: () => {
+				let edges = [];
+				
+				for(let i = 0; i < edgesCount; i++) {
+					const from = Number(Swal.getPopup().querySelector('#edge-from-' + i).value);
+					const to = Number(Swal.getPopup().querySelector('#edge-to-' + i).value);
+					
+					let edge = {from: from, to: to};
+					
+					edges.push(edge);
+				}
+				
+				return { verticesCount: verticesCount, edges: edges }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const verticesCount = result.value.verticesCount;
+				const edges = result.value.edges;
+				
+				const graph = new Graph(isDirectedgraph);
+				
+				for(let i = 0; i < verticesCount; i++) {
+					graph.addVertex(i);
+				}
+				
+				for(let i = 0; i < edges.length; i++) {
+					const edge = edges[i];
+					
+					graph.addEdge(edge.from, edge.to);
+				}
+				
+				showGraphStartVertexPrompt(graph, verticesCount);
+			}
+		});
+	}
+	
+	function showGraphStartVertexPrompt(graph, verticesCount) {
+		let html = '<div class="container"><div class="row mt-3">';
+		
+		let startingVertexOptions = '';
+		for(var i = 0; i < verticesCount; i++) {
+			startingVertexOptions += '<option value="' + i + '">' + i + '</option>';
+		}
+		
+		html += '<div class="col"> <select id="starting-vertex" class="form-select">' + startingVertexOptions + '</select> </div>';
+		
+		html += '</div>';
+		
+		Swal.fire({
+			title: "Starting Vertex",
+			html: html,
+			showCancelButton: false,
+			confirmButtonText: 'run',
+			preConfirm: () => {
+				let startingVertex = Number(Swal.getPopup().querySelector('#starting-vertex').value);
+				
+				return { startingVertex: startingVertex }
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const startingVertex = result.value.startingVertex;
+				
+				const traversalResults = graph.DFS(startingVertex);
+				
+				let table = $('<table></table>').addClass('table');
+
+				let caption = $('<caption>Results</caption>').addClass('caption-top');
+				table.append(caption);
+
+				let tableHeader = $('<thead><tr><th>vertex</th><th>pre order</th><th>post order</th></tr></thead>').addClass('table-light');
+				table.append(tableHeader);
+
+				let tableBody = $('<tbody></tbody>').addClass('table-group-divider');
+				
+				for(let traversalResult of traversalResults) {
+					let tableRow = $('<tr></tr>');
+					
+					tableRow.append($('<td>' + traversalResult.vertex + '</td><td>' + traversalResult.preorder + '</td><td>' + traversalResult.postorder + '</td>'));
+					
+					tableBody.append(tableRow);
+				}
+
+				table.append(tableBody);
+
+				$('body').append(table);
+			}
+		});
+	}
+	
+	function showAlert(message) {
+		Swal.fire({
+			icon: 'error',
+			title: 'Oops',
+			text: message,
+			confirmButtonText: 'close',
+			showConfirmButton: true
+		});
+	}
+</script>
+</html>
