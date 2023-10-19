@@ -49,7 +49,15 @@
 		}
 		
 		addEdge(x, y) {
-			this.graphList[x].push(y);
+			if(!this.graphList[x].includes(y)) {
+				this.graphList[x].push(y);
+			}
+			
+			if(!this.isDirected) {
+				if(!this.graphList[y].includes(x)) {
+					this.graphList[y].push(x);
+				}
+			}
 		}
 		
 		depthFirstSearchDirected(a, x, metadata, time, result) {
@@ -199,33 +207,34 @@
 					graph.addEdge(edge.from, edge.to);
 				}
 				
-				const mergeWithoutDuplicates = (arr1, arr2) => {
-					const combined = [...arr1, ...arr2];
-
-					const unique = combined.reduce((acc, current) => {
-						const exists = acc.find(item => item.x === current.x && item.y === current.y);
-						
-						if (!exists) {
-							acc.push(current);
-						}
-						
-						return acc;
-					}, []);
-
-					return unique;
-				}
-				
-				var result = [];
-				
 				for(var i = 0; i < verticesCount; i++) {
-					const temp = graph.classifyEdges(i);
+					const traversal = graph.classifyEdges(i);
 					
-					result = mergeWithoutDuplicates(result, temp);
-				}
-				
-				for(const edgeParsed of result) {
-					document.write(`(${edgeParsed.x}, ${edgeParsed.y}) is a ${edgeParsed.edgeType} edge`);
-					document.write('<br>');
+					let table = $('<table></table>').addClass('table');
+
+					let caption = $('<caption>If DFS traversal started from vertex <b>' + String.fromCharCode(65 + i) + '</b></caption>').addClass('caption-top');
+					table.append(caption);
+
+					let tableHeader = $('<thead><tr><th>from</th><th>to</th><th>edge type</th></tr></thead>').addClass('table-light');
+					table.append(tableHeader);
+
+					let tableBody = $('<tbody></tbody>').addClass('table-group-divider');
+
+					for (const edge of traversal) {
+						const fromVertex = String.fromCharCode(65 + edge.x);
+						const toVertex = edge.y = String.fromCharCode(65 + edge.y);
+						const edgeType = edge.edgeType;
+						
+						let tableRow = $('<tr></tr>');
+						
+						tableRow.append($('<td>' + fromVertex + '</td><td>' + toVertex + '</td><td>' + edgeType + '</td>'));
+
+						tableBody.append(tableRow);
+					}
+
+					table.append(tableBody);
+
+					$('body').append(table);
 				}
 			}
 		});
