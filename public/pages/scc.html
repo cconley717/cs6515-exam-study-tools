@@ -32,7 +32,7 @@
 			this.adj[v].push(w); 
 		}
 		
-		SCCUtil(u, low, disc, stackMember, st) {
+		SCCUtil(u, low, disc, stackMember, st, SCCs) {
 			disc[u] = this.Time; 
 			low[u] = this.Time; 
 			this.Time += 1;
@@ -45,7 +45,7 @@
 				n = i; 
 				   
 				if (disc[n] == -1) {
-					this.SCCUtil(n, low, disc, stackMember, st);
+					this.SCCUtil(n, low, disc, stackMember, st, SCCs);
 					low[u] = Math.min(low[u], low[n]);
 				}
 				else if (stackMember[n] == true) {
@@ -55,15 +55,18 @@
 		   
 			let w = -1; 
 			if (low[u] == disc[u]) {
+				const currentSCC = [];
+				
 				while (w != u) { 
 					w = st.pop();
 					
 					const charCode = String.fromCharCode(65 + w);
+					currentSCC.push(charCode);
 					
-					document.write(charCode + " ");
 					stackMember[w] = false;
 				}
-				document.write("<br>"); 
+				
+				SCCs.push(currentSCC);
 			}
 		}
 			 
@@ -78,12 +81,16 @@
 			   
 			let stackMember = new Array(this.V); 
 			let st = [];
+			
+			const SCCs = [];
 			   
 			for(let i = 0; i < this.V; i++) {
 				if (disc[i] == -1) {
-					this.SCCUtil(i, low, disc, stackMember, st);
+					this.SCCUtil(i, low, disc, stackMember, st, SCCs);
 				}
 			}
+			
+			return SCCs;
 		}
 	}
 	
@@ -165,7 +172,15 @@
 					graph.addEdge(edge.from, edge.to);
 				}
 				
-				graph.SCC();
+				const SCCs = graph.SCC();
+				
+				for(const SCC of SCCs) {
+					for(const vertex of SCC) {
+						document.write(vertex + ' ');
+					}
+					
+					document.write('<br>'); 
+				}
 			}
 		});
 	}

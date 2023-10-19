@@ -17,60 +17,104 @@
 	});
 	
 	class Graph {
-		constructor(v) {
-			this.v = v;
+		constructor(vertices, isDirected) {
+			this.vertices = vertices;
+			this.isDirected = isDirected;
 			
-			this.time = 0;
-			this.traversalArray = [];
+			this.graphList = Array.from({length: vertices}, () => []);
 			
-			this.graphList = new Array(v).fill(0).map(() => []);
+			this.UNDISCOVERED = 'undiscovered';
+			this.DISCOVERED = 'discovered';
+			this.PROCESSED = 'processed';
+			
+			this.TREE = 'tree';
+			this.BACK = 'back';
+			this.FORWARD = 'forward';
+			this.CROSS = 'cross';
+		}
+
+		classifyEdges(start) {
+			const metadata = Array.from(this.graphList, () => ({state: this.UNDISCOVERED}));
+			
+			const result = [];
+			
+			if(this.isDirected) {
+				this.depthFirstSearchDirected(this.graphList, start, metadata, 0, result);
+			}
+			else {
+				this.depthFirstSearchUndirected(this.graphList, start, metadata, result);
+			}
+			
+			return result;
 		}
 		
-		addEdge(from, to) {
-			this.graphList[from].push(to);
+		addEdge(x, y) {
+			this.graphList[x].push(y);
 		}
-
-		printEdgeTypes() {
-			this.visited = new Array(this.v).fill(false);
-			this.startTime = new Array(this.v).fill(0);
-			this.endTime = new Array(this.v).fill(0);
-
-			for (let node = 0; node < this.v; node++) {
-				if (!this.visited[node]) {
-					this.traverseDfs(node);
-				}
+		
+		depthFirstSearchDirected(a, x, metadata, time, result) {
+			if (metadata[x].state !== this.UNDISCOVERED) {
+				return time;
 			}
-		}
 
-		traverseDfs(node) {
-			this.visited[node] = true;
-			this.traversalArray.push(node);
-			this.startTime[node] = this.time;
-			this.time++;
+			metadata[x].state = this.DISCOVERED;
+			metadata[x].entryTime = time;
+			
+			time += 1;
 
-			for (let neighbour of this.graphList[node]) {
-				const neighbourCharCode = String.fromCharCode(65 + Number(neighbour));
-				const nodeCharCode = String.fromCharCode(65 + Number(node));
+			for (const y of a[x]) {
+				let edgeType;
+
+				if (metadata[y].state === this.UNDISCOVERED) {
+					edgeType = this.TREE;
+					metadata[y].parent = x;
+				} else if (metadata[y].state === this.DISCOVERED) {
+					edgeType = this.BACK;
+				} else if (metadata[y].state === this.PROCESSED) {
+					edgeType = metadata[y].entryTime < metadata[x].entryTime ? this.CROSS : this.FORWARD;
+				}
 				
-				if (!this.visited[neighbour]) {
-					document.write('Tree Edge: ', `${nodeCharCode} to ${neighbourCharCode}`); 
-					document.write('<br>');
-					this.traverseDfs(neighbour);
-				} else {
-					if (this.startTime[node] > this.startTime[neighbour] && this.endTime[node] < this.endTime[neighbour]) {
-						document.write('Back Edge: ', `${nodeCharCode} to ${neighbourCharCode}`);
-						document.write('<br>');
-					} else if (this.startTime[node] < this.startTime[neighbour] && this.endTime[node] > this.endTime[neighbour]) {
-						document.write('Forward Edge: ', `${nodeCharCode} to ${neighbourCharCode}`);
-						document.write('<br>');
-					} else if (this.startTime[node] > this.startTime[neighbour] && this.endTime[node] > this.endTime[neighbour]) {
-						document.write('Cross Edge: ', `${nodeCharCode} to ${neighbourCharCode}`);
-						document.write('<br>');
-					}
+				if(x != y) {
+					const discoveredEdge = {x: x, y: y, edgeType: edgeType};
+					
+					result.push(discoveredEdge);
 				}
-				this.endTime[node] = this.time;
-				this.time++;
+				
+				time = this.depthFirstSearchDirected(a, y, metadata, time, result);
 			}
+
+			metadata[x].state = this.PROCESSED;
+			
+			return time;
+		}
+		
+		depthFirstSearchUndirected(a, x, metadata, result) {
+			if (metadata[x].state !== this.UNDISCOVERED) {
+				return;
+			}
+
+			metadata[x].state = this.DISCOVERED;
+
+			for (const y of a[x]) {
+				let edgeType;
+
+				if (metadata[y].state === this.UNDISCOVERED) {
+					edgeType = this.TREE;
+					metadata[y].parent = x;
+				} else if (metadata[y].state === this.DISCOVERED && metadata[x].parent !== y) {
+					edgeType = this.BACK;
+				}
+
+				if (edgeType && x !== y) {
+					const discoveredEdge = {x: x, y: y, edgeType: edgeType};
+					
+					result.push(discoveredEdge);
+				}
+
+				this.depthFirstSearchUndirected(a, y, metadata, result);
+			}
+
+			metadata[x].state = this.PROCESSED;
 		}
 	}
 	
@@ -79,27 +123,30 @@
 			title: "Vertices and Edges?",
 			html: '\
 			<div class="input-group mb-3"><input id="verticesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="vertices count"/></div> \
-			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div>',
+			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div> \
+			<div class="form-check form-switch d-flex justify-content-center"> <input id="isDirectedGraphSwitch" class="form-check-input me-3" type="checkbox" role="switch"> <label class="form-check-label" for="isDirectedGraphSwitch">is a directed graph</label> </div>',
 			showCancelButton: false,
 			confirmButtonText: 'next',
 			preConfirm: () => {
 				const verticesCount = Number(Swal.getPopup().querySelector('#verticesCountInput').value);
 				const edgesCount = Number(Swal.getPopup().querySelector('#edgesCountInput').value);
+				const isDirectedgraph = Swal.getPopup().querySelector('#isDirectedGraphSwitch').checked;
 				
-				return { verticesCount: verticesCount, edgesCount: edgesCount }
+				return { verticesCount: verticesCount, edgesCount: edgesCount, isDirectedgraph: isDirectedgraph }
 			}
 		})
 		.then((result) => {
 			if (result.isConfirmed) {
 				const verticesCount = result.value.verticesCount;
 				const edgesCount = result.value.edgesCount;
+				const isDirectedgraph = result.value.isDirectedgraph;
 				
-				showGraphEdgesPrompt(verticesCount, edgesCount);
+				showGraphEdgesPrompt(verticesCount, edgesCount, isDirectedgraph);
 			}
 		});
 	}
 	
-	function showGraphEdgesPrompt(verticesCount, edgesCount) {
+	function showGraphEdgesPrompt(verticesCount, edgesCount, isDirectedgraph) {
 		let html = '<div class="container mt-5">';
 		
 		for(var i = 0; i < edgesCount; i++) {
@@ -144,7 +191,7 @@
 				const verticesCount = result.value.verticesCount;
 				const edges = result.value.edges;
 				
-				const graph = new Graph(verticesCount);
+				const graph = new Graph(verticesCount, isDirectedgraph);
 				
 				for(let i = 0; i < edges.length; i++) {
 					const edge = edges[i];
@@ -152,7 +199,34 @@
 					graph.addEdge(edge.from, edge.to);
 				}
 				
-				graph.printEdgeTypes();
+				const mergeWithoutDuplicates = (arr1, arr2) => {
+					const combined = [...arr1, ...arr2];
+
+					const unique = combined.reduce((acc, current) => {
+						const exists = acc.find(item => item.x === current.x && item.y === current.y);
+						
+						if (!exists) {
+							acc.push(current);
+						}
+						
+						return acc;
+					}, []);
+
+					return unique;
+				}
+				
+				var result = [];
+				
+				for(var i = 0; i < verticesCount; i++) {
+					const temp = graph.classifyEdges(i);
+					
+					result = mergeWithoutDuplicates(result, temp);
+				}
+				
+				for(const edgeParsed of result) {
+					document.write(`(${edgeParsed.x}, ${edgeParsed.y}) is a ${edgeParsed.edgeType} edge`);
+					document.write('<br>');
+				}
 			}
 		});
 	}
