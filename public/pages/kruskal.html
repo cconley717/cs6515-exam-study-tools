@@ -121,8 +121,8 @@
 		for(var i = 0; i < edgesCount; i++) {
 			html += '<div class="row mt-3">';
 			
-			let fromOptions = '';
-			let toOptions = '';
+			let fromOptions = '<option value="" selected disabled>from</option>';
+			let toOptions = '<option value="" selected disabled>to</option>';
 			for(var j = 0; j < verticesCount; j++) {
 				fromOptions += '<option value="' + j + '">' + j + '</option>';
 				toOptions += '<option value="' + j + '">' + j + '</option>';
