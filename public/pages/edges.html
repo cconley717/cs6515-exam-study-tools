@@ -49,19 +49,22 @@
 			this.time++;
 
 			for (let neighbour of this.graphList[node]) {
+				const neighbourCharCode = String.fromCharCode(65 + Number(neighbour));
+				const nodeCharCode = String.fromCharCode(65 + Number(node));
+				
 				if (!this.visited[neighbour]) {
-					document.write('Tree Edge: ', `${node} to ${neighbour}`); 
+					document.write('Tree Edge: ', `${nodeCharCode} to ${neighbourCharCode}`); 
 					document.write('<br>');
 					this.traverseDfs(neighbour);
 				} else {
 					if (this.startTime[node] > this.startTime[neighbour] && this.endTime[node] < this.endTime[neighbour]) {
-						document.write('Back Edge: ', `${node} to ${neighbour}`);
+						document.write('Back Edge: ', `${nodeCharCode} to ${neighbourCharCode}`);
 						document.write('<br>');
 					} else if (this.startTime[node] < this.startTime[neighbour] && this.endTime[node] > this.endTime[neighbour]) {
-						document.write('Forward Edge: ', `${node} to ${neighbour}`);
+						document.write('Forward Edge: ', `${nodeCharCode} to ${neighbourCharCode}`);
 						document.write('<br>');
 					} else if (this.startTime[node] > this.startTime[neighbour] && this.endTime[node] > this.endTime[neighbour]) {
-						document.write('Cross Edge: ', `${node} to ${neighbour}`);
+						document.write('Cross Edge: ', `${nodeCharCode} to ${neighbourCharCode}`);
 						document.write('<br>');
 					}
 				}
@@ -105,8 +108,10 @@
 			let fromOptions = '<option value="" selected disabled>from</option>';
 			let toOptions = '<option value="" selected disabled>to</option>';
 			for(var j = 0; j < verticesCount; j++) {
-				fromOptions += '<option value="' + j + '">' + j + '</option>';
-				toOptions += '<option value="' + j + '">' + j + '</option>';
+				const charCode = String.fromCharCode(65 + j);
+				
+				fromOptions += '<option value="' + j + '">' + charCode + '</option>';
+				toOptions += '<option value="' + j + '">' + charCode + '</option>';
 			}
 			
 			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> </div>';

@@ -55,8 +55,10 @@
 
 		for (let i = 0; i < V; i++) {
 			let tableRow = $('<tr></tr>');
-
-			tableRow.append($('<td>' + i + '</td><td>' + dist[i] + '</td>'));
+			
+			const charCode = String.fromCharCode(65 + i);
+			
+			tableRow.append($('<td>' + charCode + '</td><td>' + dist[i] + '</td>'));
 
 			tableBody.append(tableRow);
 		}
@@ -137,8 +139,10 @@
 			let fromOptions = '<option value="" selected disabled>from</option>';
 			let toOptions = '<option value="" selected disabled>to</option>';
 			for(var j = 0; j < verticesCount; j++) {
-				fromOptions += '<option value="' + j + '">' + j + '</option>';
-				toOptions += '<option value="' + j + '">' + j + '</option>';
+				const charCode = String.fromCharCode(65 + j);
+				
+				fromOptions += '<option value="' + j + '">' + charCode + '</option>';
+				toOptions += '<option value="' + j + '">' + charCode + '</option>';
 			}
 			
 			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> <div class="col"> <input id="edge-weight-'+i+'" class="form-control" placeholder="weight" /> </div></div>';
@@ -191,7 +195,9 @@
 		
 		let startingVertexOptions = '';
 		for(var i = 0; i < verticesCount; i++) {
-			startingVertexOptions += '<option value="' + i + '">' + i + '</option>';
+			const charCode = String.fromCharCode(65 + i);
+			
+			startingVertexOptions += '<option value="' + i + '">' + charCode + '</option>';
 		}
 		
 		html += '<div class="col"> <select id="starting-vertex" class="form-select">' + startingVertexOptions + '</select> </div>';

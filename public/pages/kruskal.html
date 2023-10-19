@@ -124,8 +124,10 @@
 			let fromOptions = '<option value="" selected disabled>from</option>';
 			let toOptions = '<option value="" selected disabled>to</option>';
 			for(var j = 0; j < verticesCount; j++) {
-				fromOptions += '<option value="' + j + '">' + j + '</option>';
-				toOptions += '<option value="' + j + '">' + j + '</option>';
+				const charCode = String.fromCharCode(65 + j);
+				
+				fromOptions += '<option value="' + j + '">' + charCode + '</option>';
+				toOptions += '<option value="' + j + '">' + charCode + '</option>';
 			}
 			
 			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> <div class="col"> <input id="edge-weight-'+i+'" class="form-control" placeholder="weight" /> </div></div>';
@@ -185,7 +187,10 @@
 				for(let edge of mst) {
 					let tableRow = $('<tr></tr>');
 					
-					tableRow.append($('<td>' + edge.from + '</td><td>' + edge.to + '</td><td>' + edge.weight + '</td>'));
+					const charCodeFrom = String.fromCharCode(65 + Number(edge.from));
+					const charCodeTo = String.fromCharCode(65 + Number(edge.to));
+					
+					tableRow.append($('<td>' + charCodeFrom + '</td><td>' + charCodeTo + '</td><td>' + edge.weight + '</td>'));
 					
 					tableBody.append(tableRow);
 				}

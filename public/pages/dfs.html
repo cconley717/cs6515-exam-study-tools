@@ -65,7 +65,7 @@
 			}
 
 			for (const vertex in traversalOrder) {
-				results.push({vertex: vertex, preorder: traversalOrder[vertex].preorder, postorder: traversalOrder[vertex].postorder});
+				results.push({vertex: Number(vertex), preorder: traversalOrder[vertex].preorder, postorder: traversalOrder[vertex].postorder});
 			}
 
 			return results;
@@ -109,8 +109,10 @@
 			let fromOptions = '<option value="" selected disabled>from</option>';
 			let toOptions = '<option value="" selected disabled>to</option>';
 			for(var j = 0; j < verticesCount; j++) {
-				fromOptions += '<option value="' + j + '">' + j + '</option>';
-				toOptions += '<option value="' + j + '">' + j + '</option>';
+				const charCode = String.fromCharCode(65 + j);
+				
+				fromOptions += '<option value="' + j + '">' + charCode + '</option>';
+				toOptions += '<option value="' + j + '">' + charCode + '</option>';
 			}
 			
 			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> </div>';
@@ -165,7 +167,9 @@
 		
 		let startingVertexOptions = '';
 		for(var i = 0; i < verticesCount; i++) {
-			startingVertexOptions += '<option value="' + i + '">' + i + '</option>';
+			const charCode = String.fromCharCode(65 + i);
+			
+			startingVertexOptions += '<option value="' + i + '">' + charCode + '</option>';
 		}
 		
 		html += '<div class="col"> <select id="starting-vertex" class="form-select">' + startingVertexOptions + '</select> </div>';
@@ -202,7 +206,9 @@
 				for(let traversalResult of traversalResults) {
 					let tableRow = $('<tr></tr>');
 					
-					tableRow.append($('<td>' + traversalResult.vertex + '</td><td>' + traversalResult.preorder + '</td><td>' + traversalResult.postorder + '</td>'));
+					const charCode = String.fromCharCode(65 + traversalResult.vertex);
+					
+					tableRow.append($('<td>' + charCode + '</td><td>' + traversalResult.preorder + '</td><td>' + traversalResult.postorder + '</td>'));
 					
 					tableBody.append(tableRow);
 				}

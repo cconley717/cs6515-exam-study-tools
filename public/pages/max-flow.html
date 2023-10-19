@@ -59,7 +59,7 @@
 			return false;
 		}
 		
-		fordFulkerson(s, t) {
+		edmondsKarp(s, t) {
 			let u, v;
 			
 			let residualGraph = new Array(this.vertices);
@@ -107,7 +107,9 @@
 			let tableHeaderHtml = '<thead><tr><th>(from &#8595, to &#8594)</th>';
 			
 			for(var i = 0; i < dist.length; i++) {
-				tableHeaderHtml+= '<th>' + i + '</th>';
+				const charCode = String.fromCharCode(65 + i);
+				
+				tableHeaderHtml+= '<th>' + charCode + '</th>';
 			}
 			
 			tableHeaderHtml += '</tr></thead>';
@@ -119,7 +121,9 @@
 			
 			for (var i = 0; i < this.vertices; ++i) {
 				let tableRow = $('<tr></tr>');
-				tableRow.append($('<td>' + i + '</td>'));
+				const charCode = String.fromCharCode(65 + i);
+				
+				tableRow.append($('<td>' + charCode + '</td>'));
 				
 				for (var j = 0; j < this.vertices; ++j) {
 					if (dist[i][j] == this.INF) {
@@ -172,8 +176,10 @@
 			let fromOptions = '<option value="" selected disabled>from</option>';
 			let toOptions = '<option value="" selected disabled>to</option>';
 			for(var j = 0; j < verticesCount; j++) {
-				fromOptions += '<option value="' + j + '">' + j + '</option>';
-				toOptions += '<option value="' + j + '">' + j + '</option>';
+				const charCode = String.fromCharCode(65 + j);
+				
+				fromOptions += '<option value="' + j + '">' + charCode + '</option>';
+				toOptions += '<option value="' + j + '">' + charCode + '</option>';
 			}
 			
 			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> <div class="col"> <input id="edge-capacity-'+i+'" class="form-control" placeholder="capacity" /> </div></div>';
@@ -225,7 +231,9 @@
 		
 		let vertexOptions = '';
 		for(var i = 0; i < verticesCount; i++) {
-			vertexOptions += '<option value="' + i + '">' + i + '</option>';
+			const charCode = String.fromCharCode(65 + i);
+			
+			vertexOptions += '<option value="' + i + '">' + charCode + '</option>';
 		}
 		
 		html += '<div class="col"> <select id="starting-vertex" class="form-select">' + vertexOptions + '</select> </div> <div class="col"> <select id="ending-vertex" class="form-select">' + vertexOptions + '</select> </div>';
@@ -249,7 +257,7 @@
 				const startingVertex = result.value.startingVertex;
 				const endingVertex = result.value.endingVertex;
 				
-				graph.fordFulkerson(startingVertex, endingVertex);
+				graph.edmondsKarp(startingVertex, endingVertex);
 			}
 		});
 	}

@@ -57,7 +57,10 @@
 			if (low[u] == disc[u]) {
 				while (w != u) { 
 					w = st.pop();
-					document.write(w + " ");
+					
+					const charCode = String.fromCharCode(65 + w);
+					
+					document.write(charCode + " ");
 					stackMember[w] = false;
 				}
 				document.write("<br>"); 
@@ -118,8 +121,10 @@
 			let fromOptions = '<option value="" selected disabled>from</option>';
 			let toOptions = '<option value="" selected disabled>to</option>';
 			for(var j = 0; j < verticesCount; j++) {
-				fromOptions += '<option value="' + j + '">' + j + '</option>';
-				toOptions += '<option value="' + j + '">' + j + '</option>';
+				const charCode = String.fromCharCode(65 + j);
+				
+				fromOptions += '<option value="' + j + '">' + charCode + '</option>';
+				toOptions += '<option value="' + j + '">' + charCode + '</option>';
 			}
 			
 			html += '<div class="col"> <select id="edge-from-' + i + '" class="form-select">' + fromOptions + '</select> </div> <div class="col"> <select id="edge-to-' + i + '" class="form-select">' + toOptions + '</select> </div> </div>';
