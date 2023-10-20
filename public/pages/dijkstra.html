@@ -49,8 +49,14 @@
 			}
 			
 			let currVertex = this.vertexWithMinDistance(distances, visited);
-
+			
+			let iterationCount = 1;
+			
+			this.outputTableIteration(distances, iterationCount);
+			
 			while (currVertex !== null) {
+				iterationCount++;
+				
 				let distance = distances[currVertex],
 					neighbors = this.adjacencyList[currVertex];
 				for (let neighbor in neighbors) {
@@ -60,8 +66,11 @@
 						parents[neighbor] = currVertex;
 					}
 				}
+				
 				visited.add(currVertex);
 				currVertex = this.vertexWithMinDistance(distances, visited);
+				
+				this.outputTableIteration(distances, iterationCount, source);
 			}
 
 			return distances;
@@ -78,6 +87,34 @@
 				}
 			}
 			return minVertex;
+		}
+		
+		outputTableIteration(distances, iterationCount, source) {
+			let table = $('<table></table>').addClass('table');
+
+			let caption = $('<caption>Iteration: ' + iterationCount + '</caption>').addClass('caption-top');
+			table.append(caption);
+			
+			const charCode = String.fromCharCode(65 + Number(source));
+
+			let tableHeader = $('<thead><tr><th>vertex</th><th>distance from: ' + charCode + '</th></tr></thead>').addClass('table-light');
+			table.append(tableHeader);
+
+			let tableBody = $('<tbody></tbody>').addClass('table-group-divider');
+			
+			for (const [key, value] of Object.entries(distances)) {
+				let tableRow = $('<tr></tr>');
+				
+				const charCode = String.fromCharCode(65 + Number(key));
+				
+				tableRow.append($('<td>' + charCode + '</td><td>' + value + '</td>'));
+				
+				tableBody.append(tableRow);
+			}
+			
+			table.append(tableBody);
+
+			$('body').append(table);
 		}
 	}
 	
@@ -198,31 +235,7 @@
 			if (result.isConfirmed) {
 				const startingVertex = result.value.startingVertex;
 				
-				const traversalResults = graph.dijkstra(startingVertex);
-				
-				let table = $('<table></table>').addClass('table');
-
-				let caption = $('<caption>Results</caption>').addClass('caption-top');
-				table.append(caption);
-
-				let tableHeader = $('<thead><tr><th>vertex</th><th>distance from: ' + startingVertex + '</th></tr></thead>').addClass('table-light');
-				table.append(tableHeader);
-
-				let tableBody = $('<tbody></tbody>').addClass('table-group-divider');
-				
-				for (const [key, value] of Object.entries(traversalResults)) {
-					let tableRow = $('<tr></tr>');
-					
-					const charCode = String.fromCharCode(65 + Number(key));
-					
-					tableRow.append($('<td>' + charCode + '</td><td>' + value + '</td>'));
-					
-					tableBody.append(tableRow);
-				}
-				
-				table.append(tableBody);
-
-				$('body').append(table);
+				graph.dijkstra(startingVertex);
 			}
 		});
 	}
