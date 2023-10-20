@@ -20,52 +20,81 @@
 		constructor(v, isDirected = false) {
 			this.V = v;
 			this.isDirected = isDirected;
-			
+
 			this.adj = new Array(v);
-			
+
 			for(let i = 0; i < v; i++) {
 				this.adj[i] = [];
 			}
 		}
-		
+
 		addEdge(v, w) {
 			this.adj[v].push(w);
-			
+
 			if(!this.isDirected) {
 				this.adj[w].push(v);
 			}
 		}
-		
-		BFS(s) {
-			let visited = new Array(this.V);
+
+		BFS(source) {
+			let visited = new Array(this.V).fill(false);
+			let distances = new Array(this.V).fill(Infinity);
+			distances[source] = 0;
+
+			let queue = [];
+			visited[source] = true;
+			queue.push(source);
 			
-			for(let i = 0; i < this.V; i++) {
-				visited[i] = false;
-			}
+			let iterationCount = 1;
 			
-			let queue=[];
-			
-			visited[s]=true;
-			queue.push(s);
-			
-			var results = [];
+			this.outputTableIteration(distances, iterationCount, source);
+
+			while(queue.length !== 0) {
+				iterationCount++;
 				
-			while(queue.length > 0) {
-				s = queue[0];
-				
-				results.push(String.fromCharCode(65 + s));
-				
-				queue.shift();
-				
-				this.adj[s].forEach((adjacent,i) => { 
-					if(!visited[adjacent]) {
-						visited[adjacent] = true;
-						queue.push(adjacent);
+				let u = queue.shift(); // Dequeue a vertex
+
+				for(let i = 0; i < this.adj[u].length; i++) {
+					let v = this.adj[u][i];
+					if (!visited[v]) {
+						visited[v] = true;
+						distances[v] = distances[u] + 1;
+						queue.push(v);
 					}
-				});
+				}
+				
+				this.outputTableIteration(distances, iterationCount, source);
 			}
 			
-			return results;
+			return distances;
+		}
+		
+		outputTableIteration(distances, iterationCount, source) {
+			let table = $('<table></table>').addClass('table');
+
+			let caption = $('<caption>Iteration: ' + iterationCount + '</caption>').addClass('caption-top');
+			table.append(caption);
+			
+			const charCode = String.fromCharCode(65 + Number(source));
+
+			let tableHeader = $('<thead><tr><th>vertex</th><th>distance from: ' + charCode + '</th></tr></thead>').addClass('table-light');
+			table.append(tableHeader);
+
+			let tableBody = $('<tbody></tbody>').addClass('table-group-divider');
+			
+			for (const [key, value] of Object.entries(distances)) {
+				let tableRow = $('<tr></tr>');
+				
+				const charCode = String.fromCharCode(65 + Number(key));
+				
+				tableRow.append($('<td>' + charCode + '</td><td>' + value + '</td>'));
+				
+				tableBody.append(tableRow);
+			}
+			
+			table.append(tableBody);
+
+			$('body').append(table);
 		}
 	}
 	
@@ -184,9 +213,7 @@
 			if (result.isConfirmed) {
 				const startingVertex = result.value.startingVertex;
 				
-				const traversalResults = graph.BFS(startingVertex);
-
-				$('body').append(traversalResults.join(', '));
+				graph.BFS(startingVertex);
 			}
 		});
 	}
