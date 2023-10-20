@@ -39,8 +39,6 @@
 		}
 
 		floydWarshall() {
-			this.outputAdjacencyMatrix('Graph Initial State', this.distanceMatrix);
-			
 			var i, j, k;
 			
 			var dist = Array.from(Array(this.vertices), () => new Array(this.vertices).fill(0));
@@ -51,6 +49,10 @@
 				}
 			}
 			
+			this.outputAdjacencyMatrix('Graph Initial State', dist);
+			
+			let iterationCount = 1;
+			
 			for (k = 0; k < this.vertices; k++) {
 				for (i = 0; i < this.vertices; i++) {
 					for (j = 0; j < this.vertices; j++) {
@@ -59,9 +61,11 @@
 						}
 					}
 				}
+				
+				this.outputAdjacencyMatrix('Iteration: ' + iterationCount, dist);
+				
+				iterationCount++;
 			}
-			
-			this.outputAdjacencyMatrix('Graph Shortest Paths', dist);
 		}
 		
 		outputAdjacencyMatrix(text, dist) {
