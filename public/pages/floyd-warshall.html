@@ -21,7 +21,7 @@
 			this.vertices = vertices;
 			this.isDirected = isDirected;
 			
-			this.INF = 99999;
+			this.INF = Infinity;
 			
 			this.distanceMatrix = Array.from({ length: vertices }, () => Array.from({ length: vertices }, () => this.INF));
 			
@@ -56,7 +56,7 @@
 			for (k = 0; k < this.vertices; k++) {
 				for (i = 0; i < this.vertices; i++) {
 					for (j = 0; j < this.vertices; j++) {
-						if (dist[i][k] + dist[k][j] < dist[i][j]) {
+						if (dist[i][k] + dist[k][j] < dist[i][j] && dist[i][k] !== this.INF && dist[k][j] !== this.INF) {
 							dist[i][j] = dist[i][k] + dist[k][j];
 						}
 					}
@@ -98,7 +98,7 @@
 				
 				for (var j = 0; j < this.vertices; ++j) {
 					if (dist[i][j] == this.INF) {
-						tableRow.append($('<td>INF</td>'));
+						tableRow.append($('<td>infinity</td>'));
 					} else {
 						tableRow.append($('<td>' + dist[i][j] + '</td>'));
 					}
