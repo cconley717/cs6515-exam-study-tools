@@ -17,7 +17,9 @@
 	});
 	
 	class Graph {
-		constructor() {
+		constructor(isDirected) {
+			this.isDirected = isDirected;
+			
 			this.vertices = [];
 			this.adjacencyList = {};
 		}
@@ -29,6 +31,10 @@
 
 		addEdge(vertex1, vertex2, weight) {
 			this.adjacencyList[vertex1][vertex2] = weight;
+			
+			if(!this.isDirected) {
+				this.adjacencyList[vertex2][vertex1] = weight;
+			}
 		}
 
 		changeWeight(vertex1, vertex2, weight) {
@@ -50,13 +56,11 @@
 			
 			let currVertex = this.vertexWithMinDistance(distances, visited);
 			
+			this.outputTableIteration(distances, 'Starting Table', source);
+			
 			let iterationCount = 1;
 			
-			this.outputTableIteration(distances, iterationCount, source);
-			
 			while (currVertex !== null) {
-				iterationCount++;
-				
 				let distance = distances[currVertex],
 					neighbors = this.adjacencyList[currVertex];
 				for (let neighbor in neighbors) {
@@ -70,7 +74,9 @@
 				visited.add(currVertex);
 				currVertex = this.vertexWithMinDistance(distances, visited);
 				
-				this.outputTableIteration(distances, iterationCount, source);
+				this.outputTableIteration(distances, 'Iteration: ' + iterationCount, source);
+				
+				iterationCount++;
 			}
 
 			return distances;
@@ -89,10 +95,10 @@
 			return minVertex;
 		}
 		
-		outputTableIteration(distances, iterationCount, source) {
+		outputTableIteration(distances, description, source) {
 			let table = $('<table></table>').addClass('table');
 
-			let caption = $('<caption>Iteration: ' + iterationCount + '</caption>').addClass('caption-top');
+			let caption = $('<caption>' + description + '</caption>').addClass('caption-top');
 			table.append(caption);
 			
 			const charCode = String.fromCharCode(65 + Number(source));
@@ -123,27 +129,30 @@
 			title: "Vertices and Edges?",
 			html: '\
 			<div class="input-group mb-3"><input id="verticesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="vertices count"/></div> \
-			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div>',
+			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div> \
+			<div class="form-check form-switch d-flex justify-content-center"> <input id="isDirectedGraphSwitch" class="form-check-input me-3" type="checkbox" role="switch"> <label class="form-check-label" for="isDirectedGraphSwitch">is a directed graph</label> </div>',
 			showCancelButton: false,
 			confirmButtonText: 'next',
 			preConfirm: () => {
 				const verticesCount = Number(Swal.getPopup().querySelector('#verticesCountInput').value);
 				const edgesCount = Number(Swal.getPopup().querySelector('#edgesCountInput').value);
+				const isDirectedgraph = Swal.getPopup().querySelector('#isDirectedGraphSwitch').checked;
 				
-				return { verticesCount: verticesCount, edgesCount: edgesCount }
+				return { verticesCount: verticesCount, edgesCount: edgesCount, isDirectedgraph: isDirectedgraph }
 			}
 		})
 		.then((result) => {
 			if (result.isConfirmed) {
 				const verticesCount = result.value.verticesCount;
 				const edgesCount = result.value.edgesCount;
+				const isDirectedgraph = result.value.isDirectedgraph;
 				
-				showGraphEdgesPrompt(verticesCount, edgesCount);
+				showGraphEdgesPrompt(verticesCount, edgesCount, isDirectedgraph);
 			}
 		});
 	}
 	
-	function showGraphEdgesPrompt(verticesCount, edgesCount) {
+	function showGraphEdgesPrompt(verticesCount, edgesCount, isDirectedgraph) {
 		let html = '<div class="container mt-5">';
 		
 		for(var i = 0; i < edgesCount; i++) {
@@ -189,7 +198,7 @@
 				const verticesCount = result.value.verticesCount;
 				const edges = result.value.edges;
 				
-				const graph = new Graph();
+				const graph = new Graph(isDirectedgraph);
 				
 				for(let i = 0; i < verticesCount; i++) {
 					graph.addVertex(i);

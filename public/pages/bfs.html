@@ -45,12 +45,12 @@
 			visited[source] = true;
 			queue.push(source);
 			
+			this.outputTableIteration(distances, 'Starting Table', source);
+			
 			let iterationCount = 1;
 			
-			this.outputTableIteration(distances, iterationCount, source);
-
 			while(queue.length !== 0) {
-				iterationCount++;
+				
 				
 				let u = queue.shift(); // Dequeue a vertex
 
@@ -63,16 +63,18 @@
 					}
 				}
 				
-				this.outputTableIteration(distances, iterationCount, source);
+				this.outputTableIteration(distances, 'Iteration: ' + iterationCount, source);
+				
+				iterationCount++;
 			}
 			
 			return distances;
 		}
 		
-		outputTableIteration(distances, iterationCount, source) {
+		outputTableIteration(distances, description, source) {
 			let table = $('<table></table>').addClass('table');
 
-			let caption = $('<caption>Iteration: ' + iterationCount + '</caption>').addClass('caption-top');
+			let caption = $('<caption>' + description + '</caption>').addClass('caption-top');
 			table.append(caption);
 			
 			const charCode = String.fromCharCode(65 + Number(source));

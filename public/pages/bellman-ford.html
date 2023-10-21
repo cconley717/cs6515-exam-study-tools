@@ -25,30 +25,78 @@
 	}
 	 
 	class Graph {
-		constructor(V, E) {
+		constructor(V, E, isDirected) {
 			this.V = V;
-			this.E = E;
+			this.E = isDirected ? E : 2 * E;
 			this.edge = [];
+			this.isDirected = isDirected;
 		}
 	}
 	 
-	function createGraph(V, E) {
-		const graph = new Graph(V, E);
-		
-		for (let i = 0; i < E; i++) {
-			graph.edge[i] = new Edge();
-		}
+	function createGraph(V, E, isDirected) {
+		const graph = new Graph(V, E, isDirected);
 		
 		return graph;
 	}
+	
+	function addEdge(graph, src, dest, weight) {
+		const edgeIndex = graph.edge.length;
+
+		graph.edge[edgeIndex] = new Edge(src, dest, weight);
+		
+		if (!graph.isDirected) {
+			graph.edge[edgeIndex + 1] = new Edge(dest, src, weight);
+		}
+	}
 	 
-	function printArr(dist, V, src, iteration) {
+	function BellmanFord(graph, src) {
+		const V = graph.V;
+		const E = graph.E;
+		const dist = [];
+
+		for (let i = 0; i < V; i++) {
+			dist[i] = Infinity;
+		}
+		
+		dist[src] = 0;
+		
+		printArr(dist, V, src, 'Starting Table');
+
+		for (let i = 1; i <= V - 1; i++) {
+			for (let j = 0; j < E; j++) {
+				const u = graph.edge[j].src;
+				const v = graph.edge[j].dest;
+				const weight = graph.edge[j].weight;
+				
+				if (dist[u] !== Number.MAX_SAFE_INTEGER && dist[u] + weight < dist[v]) {
+					dist[v] = dist[u] + weight;
+				}
+			}
+
+			printArr(dist, V, src, 'Iteration: ' + i);
+		}
+
+		for (let i = 0; i < E; i++) {
+			const u = graph.edge[i].src;
+			const v = graph.edge[i].dest;
+			const weight = graph.edge[i].weight;
+			
+			if (dist[u] !== Number.MAX_SAFE_INTEGER && dist[u] + weight < dist[v]) {
+				showAlert("Graph contains negative weight cycle");
+				return;
+			}
+		}
+	}
+	
+	function printArr(dist, V, src, description) {
 		let table = $('<table></table>').addClass('table');
 
-		let caption = $('<caption>Iteration: ' + iteration + '</caption>').addClass('caption-top');
+		let caption = $('<caption>' + description + '</caption>').addClass('caption-top');
 		table.append(caption);
+		
+		const charCode = String.fromCharCode(65 + src);
 
-		let tableHeader = $('<thead><tr><th>vertex</th><th>distance from source: ' + src + '</th></tr></thead>').addClass('table-light');
+		let tableHeader = $('<thead><tr><th>vertex</th><th>distance from source: ' + charCode + '</th></tr></thead>').addClass('table-light');
 		table.append(tableHeader);
 
 		let tableBody = $('<tbody></tbody>').addClass('table-group-divider');
@@ -67,70 +115,36 @@
 
 		$('body').append(table);
 	}
-	 
-	function BellmanFord(graph, src) {
-		const V = graph.V;
-		const E = graph.E;
-		const dist = [];
-
-		for (let i = 0; i < V; i++) {
-			dist[i] = Number.MAX_SAFE_INTEGER;
-		}
-		
-		dist[src] = 0;
-
-		for (let i = 1; i <= V - 1; i++) {
-			for (let j = 0; j < E; j++) {
-				const u = graph.edge[j].src;
-				const v = graph.edge[j].dest;
-				const weight = graph.edge[j].weight;
-				
-				if (dist[u] !== Number.MAX_SAFE_INTEGER && dist[u] + weight < dist[v]) {
-					dist[v] = dist[u] + weight;
-				}
-			}
-
-			printArr(dist, V, src, i);
-		}
-
-		for (let i = 0; i < E; i++) {
-			const u = graph.edge[i].src;
-			const v = graph.edge[i].dest;
-			const weight = graph.edge[i].weight;
-			
-			if (dist[u] !== Number.MAX_SAFE_INTEGER && dist[u] + weight < dist[v]) {
-				showAlert("Graph contains negative weight cycle");
-				return;
-			}
-		}
-	}
 	
 	function showGraphInitializationPrompt() {
 		Swal.fire({
 			title: "Vertices and Edges?",
 			html: '\
 			<div class="input-group mb-3"><input id="verticesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="vertices count"/></div> \
-			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div>',
+			<div class="input-group mb-3"><input id="edgesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="edges count"/></div> \
+			<div class="form-check form-switch d-flex justify-content-center"> <input id="isDirectedGraphSwitch" class="form-check-input me-3" type="checkbox" role="switch"> <label class="form-check-label" for="isDirectedGraphSwitch">is a directed graph</label> </div>',
 			showCancelButton: false,
 			confirmButtonText: 'next',
 			preConfirm: () => {
 				const verticesCount = Number(Swal.getPopup().querySelector('#verticesCountInput').value);
 				const edgesCount = Number(Swal.getPopup().querySelector('#edgesCountInput').value);
+				const isDirectedgraph = Swal.getPopup().querySelector('#isDirectedGraphSwitch').checked;
 				
-				return { verticesCount: verticesCount, edgesCount: edgesCount }
+				return { verticesCount: verticesCount, edgesCount: edgesCount, isDirectedgraph: isDirectedgraph }
 			}
 		})
 		.then((result) => {
 			if (result.isConfirmed) {
 				const verticesCount = result.value.verticesCount;
 				const edgesCount = result.value.edgesCount;
+				const isDirectedgraph = result.value.isDirectedgraph;
 				
-				showGraphEdgesPrompt(verticesCount, edgesCount);
+				showGraphEdgesPrompt(verticesCount, edgesCount, isDirectedgraph);
 			}
 		});
 	}
 	
-	function showGraphEdgesPrompt(verticesCount, edgesCount) {
+	function showGraphEdgesPrompt(verticesCount, edgesCount, isDirectedgraph) {
 		let html = '<div class="container mt-5">';
 		
 		for(var i = 0; i < edgesCount; i++) {
@@ -177,12 +191,12 @@
 				const edgesCount = result.value.edgesCount;
 				const edges = result.value.edges;
 				
-				const graph = createGraph(verticesCount, edgesCount);
+				const graph = createGraph(verticesCount, edgesCount, isDirectedgraph);
 				
 				for(let i = 0; i < edges.length; i++) {
 					const edge = edges[i];
 					
-					graph.edge[i] = new Edge(edge.from, edge.to, edge.weight);
+					addEdge(graph, edge.from, edge.to, edge.weight);
 				}
 				
 				showGraphStartVertexPrompt(graph, verticesCount);
