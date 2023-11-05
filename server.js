@@ -12,53 +12,68 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/pages', 'index.html'));
 });
 
-app.get('/rsa', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'rsa.html'));
+
+app.get('/exam2', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'exam2.html'));
 });
 
-app.get('/graph-algorithms', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'graph-algorithms.html'));
+app.get('/exam2/rsa', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'rsa.html'));
 });
 
-app.get('/graph-algorithms/dfs', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'dfs.html'));
+app.get('/exam2/graph-algorithms', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'graph-algorithms.html'));
 });
 
-app.get('/graph-algorithms/bfs', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'bfs.html'));
+app.get('/exam2/graph-algorithms/dfs', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'dfs.html'));
 });
 
-app.get('/graph-algorithms/dijkstra', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'dijkstra.html'));
+app.get('/exam2/graph-algorithms/bfs', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'bfs.html'));
 });
 
-app.get('/graph-algorithms/bellman-ford', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'bellman-ford.html'));
+app.get('/exam2/graph-algorithms/dijkstra', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'dijkstra.html'));
 });
 
-app.get('/graph-algorithms/floyd-warshall', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'floyd-warshall.html'));
+app.get('/exam2/graph-algorithms/bellman-ford', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'bellman-ford.html'));
 });
 
-app.get('/graph-algorithms/prim', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'prim.html'));
+app.get('/exam2/graph-algorithms/floyd-warshall', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'floyd-warshall.html'));
 });
 
-app.get('/graph-algorithms/kruskal', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'kruskal.html'));
+app.get('/exam2/graph-algorithms/prim', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'prim.html'));
 });
 
-app.get('/graph-algorithms/max-flow', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'max-flow.html'));
+app.get('/exam2/graph-algorithms/kruskal', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'kruskal.html'));
 });
 
-app.get('/graph-algorithms/scc', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'scc.html'));
+app.get('/exam2/graph-algorithms/max-flow', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'max-flow.html'));
 });
 
-app.get('/graph-algorithms/edges', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/pages', 'edges.html'));
+app.get('/exam2/graph-algorithms/scc', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'scc.html'));
 });
+
+app.get('/exam2/graph-algorithms/edges', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam2', 'edges.html'));
+});
+
+
+app.get('/exam3', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam3', 'exam3.html'));
+});
+
+app.get('/exam3/lp', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/pages/exam3', 'lp.html'));
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);

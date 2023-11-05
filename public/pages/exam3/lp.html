@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap-5.3.2.min.css" rel="stylesheet">
+    <title>Linear Programming Example</title>
+	<style>
+		.objective-function-select {
+			width: unset;
+			display: inline-block;
+		}
+	</style>
+</head>
+<body>
+<script src="https://unpkg.com/javascript-lp-solver/prod/solver.js"></script>
+<script src="/javascript/bootstrap-5.3.2.bundle.min.js"></script>
+<script src="/javascript/jquery-3.6.4.min.js"></script>
+<script src="/javascript/sweet-alert-2-11.7.32.js"></script>
+<script src="/javascript/mathjs-12.0.0.js"></script>
+<script>
+	$(document).ready(function() {
+		showInitializationPrompt();
+	});
+	
+	function showInitializationPrompt() {
+		Swal.fire({
+			title: 'Variables and Constraints?',
+			html: '\
+			<div class="input-group mb-3"><input id="variablesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="variables count"/></div> \
+			<div class="input-group mb-3"><input id="constraintsCountInput" class="form-control" type="text" required autocomplete="off" placeholder="constraints count"/></div>',
+			showCancelButton: false,
+			confirmButtonText: 'next',
+			allowOutsideClick: false,
+			didOpen: () => {
+				loadTestData1();
+			},
+			preConfirm: () => {
+				const variablesCount = Number(Swal.getPopup().querySelector('#variablesCountInput').value);
+				const constraintsCount = Number(Swal.getPopup().querySelector('#constraintsCountInput').value);
+				
+				return { variablesCount: variablesCount, constraintsCount: constraintsCount };
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const variablesCount = result.value.variablesCount;
+				const constraintsCount = result.value.constraintsCount;
+				
+				showLinearProgramConstructionPrompt(variablesCount, constraintsCount);
+			}
+		});
+	}
+	
+	function showLinearProgramConstructionPrompt(variablesCount, constraintsCount) {
+		let objectiveFunctionHtml = '';
+		let objectiveFunctionTypeHtml = '';
+		let constraintsHtml = '';
+		
+		objectiveFunctionHtml += '<div class="input-group">';
+		
+		for(let i = 1; i <= variablesCount; i++) {
+			let temp = '<input id="objective_value_x_' + i + '" class="form-control" placeholder="x' + i + '"/>'
+			
+			objectiveFunctionHtml += temp;
+		}
+		
+		objectiveFunctionHtml += '</div>';
+		
+		objectiveFunctionTypeHtml += '\
+		<div class="input-group">\
+			<select id="primal-objective-function-type" class="form-select">\
+				<option value="" selected disabled>primal objective function type</option>\
+				<option value="max">maximize</option>\
+				<option value="min">minimize</option>\
+			</select>\
+		</div>';
+		
+		for(let i = 1; i <= constraintsCount; i++) {
+			let temp = '<div class="input-group">';
+			
+			for(let j = 1; j <= variablesCount; j++) {
+				temp += '<input id="constraint_value_' + i + '_' + j + '" class="form-control" placeholder="x' + j + '"/>';
+			}
+			
+			temp += '<select id="constraint_type_' + i + '" class="form-select objective-function-select"> <option value="lte">&lt=</option> <option value="gte">&gt=</option> <option value="eq">=</option> </select>';
+			temp += '<input id="constraint_limit_' + i + '" class="form-control" placeholder=""/>';
+			temp += '</div>';
+			
+			constraintsHtml += temp;
+		}
+		
+		const operationTypeHtml = '';
+		
+		const html = objectiveFunctionHtml + '<br>' + objectiveFunctionTypeHtml + '<br>' + constraintsHtml + '<br>' + operationTypeHtml;
+		
+		Swal.fire({
+			title: 'Objective and Constraints',
+			html: html,
+			showCancelButton: false,
+			confirmButtonText: 'solve',
+			allowOutsideClick: false,
+			didOpen: () => {
+				loadTestData2();
+			},
+			preConfirm: () => {
+				const primalObjectiveFunctionType = Swal.getPopup().querySelector('#primal-objective-function-type').value;
+				
+				if(primalObjectiveFunctionType !== '') {
+					const dualObjectiveFunctionType = (primalObjectiveFunctionType === 'max' ? 'min' : 'max');
+					
+					const primal = {
+						'optimize': 'objective',
+						'opType': primalObjectiveFunctionType,
+						'variables': {},
+						'constraints': {}
+					};
+					
+					for(let i = 1; i <= variablesCount; i++) {
+						let value = Number(Swal.getPopup().querySelector('#objective_value_x_' + i).value);
+						
+						primal.variables['x' + i] = { objective: value };
+					}
+					
+					for(let i = 1; i <= constraintsCount; i++) {
+						let constraint = '';
+						
+						for(let j = 1; j <= variablesCount; j++) {
+							const constraintValue = Number(Swal.getPopup().querySelector('#constraint_value_' + i + '_' + j).value);
+							
+							if(constraintValue != 0) {
+								constraint += constraintValue + 'x' + j + '_';
+							}
+						}
+						
+						constraint = constraint.slice(0, -1);
+						
+						const constraintType = Swal.getPopup().querySelector('#constraint_type_' + i).value;
+						const constraintLimit = Number(Swal.getPopup().querySelector('#constraint_limit_' + i).value);
+						
+						if(constraintType === 'lte') {
+							primal.constraints[constraint] = {'max': constraintLimit};
+						}
+						else if(constraintType === 'gte') {
+							primal.constraints[constraint] = {'min': constraintLimit};
+						}
+						else if(constraintType === 'eq') {
+							primal.constraints[constraint] = {'equal': constraintLimit};
+						}
+						
+						const regex = /(-?\d+)x(\d+)/gi;
+						const matches = [...constraint.matchAll(regex)];
+						
+						matches.forEach(function(match) {
+							const regex = /x(\d+)/i;
+							const match2 = match[0].match(regex);
+							
+							const variable = match2[0];
+							
+							primal.variables[variable][constraint] = Number(match[1]);
+						});
+					}
+					
+					const dual = convertPrimalToDual(variablesCount, constraintsCount, dualObjectiveFunctionType);
+					
+					const primalResults = solver.Solve(primal, null, false, null);
+					const dualResults = solver.Solve(dual, null, false, null);
+					
+					return { primal: primal, primalResults: primalResults, dual: dual, dualResults: dualResults, primalObjectiveFunctionType: primalObjectiveFunctionType, dualObjectiveFunctionType: dualObjectiveFunctionType };
+				}
+				else {
+					return false;
+				}
+			}
+		})
+		.then((result) => {
+			if (result.isConfirmed) {
+				const primal = result.value.primal;
+				const primalResults = result.value.primalResults;
+				const dual = result.value.dual;
+				const dualResults = result.value.dualResults;
+				const primalObjectiveFunctionType = result.value.primalObjectiveFunctionType;
+				const dualObjectiveFunctionType = result.value.dualObjectiveFunctionType;
+				
+				console.log(primal);
+				console.log(dual);
+				console.log(primalResults);
+				console.log(dualResults);
+				
+				outputResult(primal, primalResults, 'Primal', 'x', variablesCount, primalObjectiveFunctionType);
+				outputResult(dual, dualResults, 'Dual', 'y', constraintsCount, dualObjectiveFunctionType);
+				
+				outputConclusion(primalResults, dualResults);
+			}
+		});
+	}
+	
+	function convertPrimalToDual(variablesCount, constraintsCount, dualObjectiveFunctionType) {
+		const dual = {
+			optimize: 'objective',
+			opType: dualObjectiveFunctionType,
+			variables: {},
+			constraints: {}
+		};
+		
+		for(let i = 1; i <= constraintsCount; i++) {
+			const constraintLimit = Number(Swal.getPopup().querySelector('#constraint_limit_' + i).value);
+			
+			dual.variables['y' + i] = { objective: constraintLimit };
+		}
+		
+		let constraintsMatrix = Array.from({ length: variablesCount }, () => []);
+		
+		for(let i = 1; i <= constraintsCount; i++) {
+			for(let j = 1; j <= variablesCount; j++) {
+				const constraintValue = Number(Swal.getPopup().querySelector('#constraint_value_' + i + '_' + j).value);
+				
+				if(constraintValue != 0) {
+					constraintsMatrix[j - 1].push(constraintValue + 'y' + i);
+				}
+			}
+		}
+		
+		constraintsMatrix = constraintsMatrix.filter(subArray => subArray.length > 0);
+		
+		const constraints = constraintsMatrix.map(subArray => subArray.join('_'));
+
+		for(let i = 0; i < constraints.length; i++) {
+			const constraint = constraints[i];
+			
+			const constraintLimit = Number(Swal.getPopup().querySelector('#objective_value_x_' + (i+1)).value);
+			
+			const regex = /(-?\d+)y(\d+)/gi;
+			const matches = [...constraint.matchAll(regex)];
+			
+			matches.forEach(function(match) {
+				const constraintType = Swal.getPopup().querySelector('#constraint_type_' + (match[2])).value;
+				
+				if(constraintType === 'lte') {
+					if(dual.constraints.hasOwnProperty(constraint)) {
+						if(constraintLimit > dual.constraints[constraint].min) {
+							dual.constraints[constraint] = {'min': constraintLimit};
+						}
+					}
+					else {
+						dual.constraints[constraint] = {'min': constraintLimit};
+					}
+				}
+				else if(constraintType === 'gte') {
+					if(dual.constraints.hasOwnProperty(constraint)) {
+						if(constraintLimit < dual.constraints[constraint].max) {
+							dual.constraints[constraint] = {'max': constraintLimit};
+						}
+					}
+					else {
+						dual.constraints[constraint] = {'max': constraintLimit};
+					}
+				}
+				else if(constraintType === 'eq') {
+					dual.constraints[constraint] = {'equal': constraintLimit};
+				}
+				
+				const regex = /y(\d+)/i;
+				const match2 = match[0].match(regex);
+				
+				const variable = match2[0];
+				
+				dual.variables[variable][constraint] = Number(match[1]);
+			});
+		}
+		
+		return dual;
+	}
+	
+	function outputResult(problem, analysis, title, variablePrefix, variablesCount, objectiveFunctionType) {
+		let html = '<div class="card"> <div class="card-body"> <h5 class="card-title">' + title + '</h5> <h6 class="card-subtitle text-muted">objective function</h6><div><i>' + objectiveFunctionType + '</i></div><div>';
+		
+		const HTML_STARTING_LENGTH = html.length;
+		
+		for (const variable in problem.variables) {
+			if(problem.variables[variable].objective !== 0) {
+				if(html.length > HTML_STARTING_LENGTH) {
+					html += '+';
+				}
+			}
+			
+			html += problem.variables[variable].objective + variable;
+		}
+		
+		html += '</div>';
+		
+		html += '<h6 class="card-subtitle text-muted mt-2">constraints</h6>';
+		
+		for (const constraint in problem.constraints) {
+			const terms = constraint.split('_');
+			
+			let expression = '<div>';
+			for(var i = 0; i < terms.length; i++) {
+				const term = terms[i];
+				
+				if(i != 0) {
+					if(term.charAt(0) !== '-') {
+						expression += '+';
+					}
+				}
+				
+				expression += term;
+			}
+			
+			if(problem.constraints[constraint].hasOwnProperty('max')) {
+				expression += '<=' + problem.constraints[constraint].max;
+			}
+			else if(problem.constraints[constraint].hasOwnProperty('min')) {
+				expression += '>=' + problem.constraints[constraint].min;
+			}
+			else if(problem.constraints[constraint].hasOwnProperty('equal')) {
+				expression += '=' + problem.constraints[constraint].equal;
+			}
+			
+			expression += '</div>';
+			
+			html += expression;
+		}
+		
+		html += '<h6 class="card-subtitle text-muted mt-2">analysis</h6>';
+		html += '<div>bounded: ' + analysis.bounded + '</div>';
+		html += '<div>feasible: ' + analysis.feasible + '</div>';
+		html += '<div>result: ' + analysis.result + '</div>';
+		
+		for(var i = 1; i <= variablesCount; i++) {
+			let variable = analysis[variablePrefix + i];
+			
+			if(variable == null) {
+				variable = 0;
+			}
+			
+			if(!Number.isInteger(variable)) {
+				variable = math.format(math.fraction(variable), { fraction: 'ratio' });
+			}
+			
+			html += '<div>' + variablePrefix + i + ': ' + variable + '</div>';
+		}
+		
+		html += '</div></div>';
+		
+		$('body').append(html);
+	}
+	
+	function outputConclusion(primal, dual) {
+	  let implication;
+
+	  if (primal.feasible && primal.bounded && dual.feasible && dual.bounded) {
+		implication = 'Both problems have optimal solutions with equal objective values; strong duality holds.';
+	  } else if (!primal.feasible && dual.feasible && dual.bounded) {
+		implication = 'No solution satisfies the primal constraints. The dual has an optimal solution. The feasibility of the dual implies the primal cannot be unbounded; instead, it\'s infeasible.';
+	  } else if (primal.feasible && primal.bounded && !dual.feasible) {
+		implication = 'The primal has an optimal solution; no dual solution to compare. Since the dual is infeasible, there is no dual solution to compare against the primal\'s optimal solution.';
+	  } else if (!primal.feasible && !dual.feasible) {
+		implication = 'No solution satisfies the primal constraints. No solution satisfies the dual constraints. Neither problem has a solution, and strong duality offers no insight since both problems lack feasibility.';
+	  } else if (primal.feasible && !primal.bounded && !dual.feasible) {
+		implication = 'The optimal value of the objective function can be made infinitely large (for maximization problems) or infinitely small (for minimization problems). No solution satisfies the dual constraints. The unboundedness of the primal implies that the dual must be infeasible.';
+	  } else if (!primal.feasible && dual.feasible && !dual.bounded) {
+		implication = 'No solution satisfies the primal constraints. The optimal value of the objective function can be made infinitely large or small. The infeasibility of the primal and the unboundedness of the dual are consistent with the weak duality theorem, but there is no finite optimal solution to compare.';
+	  } else {
+		implication = 'This is an atypical scenario not covered by standard duality theorems.';
+	  }
+	  
+		let html = '<div class="card"> <div class="card-body"> <h5 class="card-title">Conclusion</h5>';
+		
+		html += '<p>' + implication + '</p>';
+		
+		html += '</div></div>';
+		
+		$('body').append(html);
+	}
+	
+	function loadTestData1() {
+		$('#variablesCountInput').val(3);
+		$('#constraintsCountInput').val(4);
+	}
+	
+	function loadTestData2() {
+		$('#objective_value_x_1').val(1);
+		$('#objective_value_x_2').val(6);
+		$('#objective_value_x_3').val(10);
+		
+		$('#constraint_value_1_1').val(1);
+		
+		$('#constraint_value_2_2').val(1);
+		
+		$('#constraint_value_3_1').val(1);
+		$('#constraint_value_3_2').val(3);
+		$('#constraint_value_3_3').val(2);
+		
+		$('#constraint_value_4_2').val(1);
+		$('#constraint_value_4_3').val(3);
+		
+		$('#constraint_limit_1').val(300);
+		$('#constraint_limit_2').val(200);
+		$('#constraint_limit_3').val(1000);
+		$('#constraint_limit_4').val(500);
+	}
+</script>
+
+</body>
+</html>
