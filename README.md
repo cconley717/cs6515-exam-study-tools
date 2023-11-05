@@ -1,5 +1,5 @@
-# cs6515-rsa-tools
-a bunch of solvers for the RSA. modular arithmetic, and graph portion of the class
+# cs6515-exam-tools
+a bunch of solvers for exams two and three
 
 sudo snap install node --classic --channel=20
 
