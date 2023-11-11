@@ -19,22 +19,38 @@
 <script src="/javascript/sweet-alert-2-11.7.32.js"></script>
 <script src="/javascript/mathjs-12.0.0.js"></script>
 <script>
+	var LOADING_TEST_DATA = false;
+	
 	$(document).ready(function() {
+		const params = new URL(window.location.href).searchParams;
+		const d = params.get('d');
+		LOADING_TEST_DATA = d === '1' ? true : false;
+		
 		showInitializationPrompt();
 	});
 	
 	function showInitializationPrompt() {
+		var html = '\
+			<div class="input-group mb-3"><input id="variablesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="How many variables?"/></div> \
+			<div class="input-group mb-3"><input id="constraintsCountInput" class="form-control" type="text" required autocomplete="off" placeholder="How many constraints?"/></div>';
+		
+				
+		if(LOADING_TEST_DATA) {
+			html += '<div><a href="https://edstem.org/us/courses/42665/lessons/72903/slides/390529" target="_blank">demo source</a></div>';
+		}
+		
+		
 		Swal.fire({
 			title: 'Variables and Constraints',
-			html: '\
-			<div class="input-group mb-3"><input id="variablesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="How many variables?"/></div> \
-			<div class="input-group mb-3"><input id="constraintsCountInput" class="form-control" type="text" required autocomplete="off" placeholder="How many constraints?"/></div>',
-			showCancelButton: false,
+			html: html,
+			showCancelButton: true,
 			confirmButtonText: 'next',
+			cancelButtonText: 'demo',
 			allowOutsideClick: false,
 			didOpen: () => {
-				//loadTestData1();
-				//loadTestData3();
+				if(LOADING_TEST_DATA) {
+					loadTestData1();
+				}
 			},
 			preConfirm: () => {
 				const variablesCount = Number(Swal.getPopup().querySelector('#variablesCountInput').value);
@@ -49,6 +65,9 @@
 				const constraintsCount = result.value.constraintsCount;
 				
 				showLinearProgramConstructionPrompt(variablesCount, constraintsCount);
+			}
+			else if(result.isDismissed) {
+				window.location.href = '/exam3/lp?d=1';
 			}
 		});
 	}
@@ -102,8 +121,9 @@
 			confirmButtonText: 'solve',
 			allowOutsideClick: false,
 			didOpen: () => {
-				//loadTestData2();
-				//loadTestData4();
+				if(LOADING_TEST_DATA) {
+					loadTestData2();
+				}
 			},
 			preConfirm: () => {
 				const primalObjectiveFunctionType = Swal.getPopup().querySelector('#primal-objective-function-type').value;
@@ -386,6 +406,10 @@
 		$('#objective_value_x_1').val(1);
 		$('#objective_value_x_2').val(6);
 		$('#objective_value_x_3').val(10);
+		
+		if(LOADING_TEST_DATA) {
+			$('#primal-objective-function-type').val('max');
+		}
 		
 		$('#constraint_value_1_1').val(1);
 		
