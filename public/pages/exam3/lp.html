@@ -34,6 +34,7 @@
 			allowOutsideClick: false,
 			didOpen: () => {
 				//loadTestData1();
+				loadTestData3();
 			},
 			preConfirm: () => {
 				const variablesCount = Number(Swal.getPopup().querySelector('#variablesCountInput').value);
@@ -102,6 +103,7 @@
 			allowOutsideClick: false,
 			didOpen: () => {
 				//loadTestData2();
+				loadTestData4();
 			},
 			preConfirm: () => {
 				const primalObjectiveFunctionType = Swal.getPopup().querySelector('#primal-objective-function-type').value;
@@ -148,7 +150,7 @@
 							primal.constraints[constraint] = {'equal': constraintLimit};
 						}
 						
-						const regex = /(-?\d+)x(\d+)/gi;
+						const regex = /(-?\d+(\.\d+)?)x(\d+)/gi;
 						const matches = [...constraint.matchAll(regex)];
 						
 						matches.forEach(function(match) {
@@ -230,11 +232,11 @@
 			
 			const constraintLimit = Number(Swal.getPopup().querySelector('#objective_value_x_' + (i+1)).value);
 			
-			const regex = /(-?\d+)y(\d+)/gi;
+			const regex = /(-?\d+(\.\d+)?)y(\d+)/gi;
 			const matches = [...constraint.matchAll(regex)];
 			
 			matches.forEach(function(match) {
-				const constraintType = Swal.getPopup().querySelector('#constraint_type_' + (match[2])).value;
+				const constraintType = Swal.getPopup().querySelector('#constraint_type_' + (match[3])).value;
 				
 				if(constraintType === 'lte') {
 					if(dual.constraints.hasOwnProperty(constraint)) {
@@ -278,8 +280,8 @@
 		const HTML_STARTING_LENGTH = html.length;
 		
 		for (const variable in problem.variables) {
-			if(problem.variables[variable].objective !== 0) {
-				if(html.length > HTML_STARTING_LENGTH) {
+			if(html.length > HTML_STARTING_LENGTH) {
+				if(problem.variables[variable].objective >= 0) {
 					html += '+';
 				}
 			}
@@ -333,9 +335,11 @@
 			if(variable == null) {
 				variable = 0;
 			}
-			
-			if(!Number.isInteger(variable)) {
-				variable = math.format(math.fraction(variable), { fraction: 'ratio' });
+			else {
+				const fraction = math.format(math.fraction(variable), { fraction: 'ratio' });
+				const number = math.format(math.fraction(variable), { fraction: 'decimal' });
+				
+				variable = fraction + ' <' + number + '>';
 			}
 			
 			html += '<div>' + variablePrefix + i + ': ' + variable + '</div>';
@@ -399,6 +403,62 @@
 		$('#constraint_limit_2').val(200);
 		$('#constraint_limit_3').val(1000);
 		$('#constraint_limit_4').val(500);
+	}
+	
+	function loadTestData3() {
+		$('#variablesCountInput').val(5);
+		$('#constraintsCountInput').val(6);
+	}
+	
+	function loadTestData4() {
+		$('#objective_value_x_1').val(21);
+		$('#objective_value_x_2').val(16);
+		$('#objective_value_x_3').val(371);
+		$('#objective_value_x_4').val(346);
+		$('#objective_value_x_5').val(884);
+		
+		$('#constraint_value_1_1').val(-0.85);
+		$('#constraint_value_1_2').val(-1.62);
+		$('#constraint_value_1_3').val(-12.78);
+		$('#constraint_value_1_4').val(-8.39);
+		$('#constraint_value_1_5').val(0);
+		
+		$('#constraint_value_2_1').val(-0.33);
+		$('#constraint_value_2_2').val(-0.2);
+		$('#constraint_value_2_3').val(-1.58);
+		$('#constraint_value_2_4').val(-1.39);
+		$('#constraint_value_2_5').val(-100.0);
+		
+		$('#constraint_value_3_1').val(0.33);
+		$('#constraint_value_3_2').val(0.2);
+		$('#constraint_value_3_3').val(1.58);
+		$('#constraint_value_3_4').val(1.39);
+		$('#constraint_value_3_5').val(100.0);
+		
+		$('#constraint_value_4_1').val(-4.64);
+		$('#constraint_value_4_2').val(-2.37);
+		$('#constraint_value_4_3').val(-74.69);
+		$('#constraint_value_4_4').val(-80.7);
+		$('#constraint_value_4_5').val(0);
+		
+		$('#constraint_value_5_1').val(9);
+		$('#constraint_value_5_2').val(8);
+		$('#constraint_value_5_3').val(7);
+		$('#constraint_value_5_4').val(508.2);
+		$('#constraint_value_5_5').val(0);
+		
+		$('#constraint_value_6_1').val(-0.5);
+		$('#constraint_value_6_2').val(0.5);
+		$('#constraint_value_6_3').val(0.5);
+		$('#constraint_value_6_4').val(-0.5);
+		$('#constraint_value_6_5').val(-0.5);
+		
+		$('#constraint_limit_1').val(-15);
+		$('#constraint_limit_2').val(-2);
+		$('#constraint_limit_3').val(6);
+		$('#constraint_limit_4').val(-4);
+		$('#constraint_limit_5').val(100);
+		$('#constraint_limit_6').val(0);
 	}
 </script>
 
