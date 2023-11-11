@@ -337,9 +337,8 @@
 			}
 			else {
 				const fraction = math.format(math.fraction(variable), { fraction: 'ratio' });
-				const number = math.format(math.fraction(variable), { fraction: 'decimal' });
 				
-				variable = fraction + ' <' + number + '>';
+				variable = fraction + ' <' + variable + '>';
 			}
 			
 			html += '<div>' + variablePrefix + i + ': ' + variable + '</div>';
