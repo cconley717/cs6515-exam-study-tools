@@ -1,6 +1,4 @@
 # cs6515-exam-tools
-a bunch of solvers for exams two and three
-
 sudo snap install node --classic --channel=20
 
 npm install
