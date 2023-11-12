@@ -13,7 +13,7 @@
 	</style>
 </head>
 <body>
-<script src="https://unpkg.com/javascript-lp-solver/prod/solver.js"></script>
+<script src="/javascript/jslpsolver-0.4.24.min.js"></script>
 <script src="/javascript/bootstrap-5.3.2.bundle.min.js"></script>
 <script src="/javascript/jquery-3.6.4.min.js"></script>
 <script src="/javascript/sweet-alert-2-11.7.32.js"></script>
@@ -34,11 +34,9 @@
 			<div class="input-group mb-3"><input id="variablesCountInput" class="form-control" type="text" required autocomplete="off" placeholder="How many variables?"/></div> \
 			<div class="input-group mb-3"><input id="constraintsCountInput" class="form-control" type="text" required autocomplete="off" placeholder="How many constraints?"/></div>';
 		
-				
 		if(LOADING_TEST_DATA) {
 			html += '<div><a href="https://edstem.org/us/courses/42665/lessons/72903/slides/390529" target="_blank">demo source</a></div>';
 		}
-		
 		
 		Swal.fire({
 			title: 'Variables and Constraints',
@@ -49,7 +47,7 @@
 			allowOutsideClick: false,
 			didOpen: () => {
 				if(LOADING_TEST_DATA) {
-					loadTestData1();
+					loadTestData3();
 				}
 			},
 			preConfirm: () => {
@@ -122,7 +120,7 @@
 			allowOutsideClick: false,
 			didOpen: () => {
 				if(LOADING_TEST_DATA) {
-					loadTestData2();
+					loadTestData4();
 				}
 			},
 			preConfirm: () => {
@@ -349,6 +347,8 @@
 		html += '<div>feasible: ' + analysis.feasible + '</div>';
 		html += '<div>result: ' + analysis.result + '</div>';
 		
+		html += '<h6 class="card-subtitle text-muted mt-2">variables</h6>';
+		
 		for(var i = 1; i <= variablesCount; i++) {
 			let variable = analysis[variablePrefix + i];
 			
@@ -362,6 +362,30 @@
 			}
 			
 			html += '<div>' + variablePrefix + i + ': ' + variable + '</div>';
+		}
+		
+		html += '<h6 class="card-subtitle text-muted mt-2">constraints substitution</h6>';
+		
+		for (let constraint in problem.constraints) {
+			const terms = constraint.split('_');
+			
+			for(var i = 1; i <= variablesCount; i++) {
+				let variable = analysis[variablePrefix + i];
+				
+				if(variable == null) {
+					variable = 0;
+				}
+				
+				constraint = constraint.replace(variablePrefix + i, '(' + variable + ')');
+			}
+			
+			constraint = constraint.replace(/_(?!-)/g, '+').replace(/_/g, '');
+			
+			const evaluation = math.evaluate(constraint);
+			
+			let expression = '<div>' + constraint + ' = ' + evaluation + '</div>';
+			
+			html += expression;
 		}
 		
 		html += '</div></div>';
