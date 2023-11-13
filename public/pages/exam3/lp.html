@@ -293,7 +293,7 @@
 	}
 	
 	function outputResult(problem, analysis, title, variablePrefix, variablesCount, objectiveFunctionType) {
-		let html = '<div class="card"> <div class="card-body"> <h5 class="card-title">' + title + '</h5> <h6 class="card-subtitle text-muted">objective function</h6><div><i>' + objectiveFunctionType + '</i></div><div>';
+		let html = '<div class="card"> <div class="card-body"> <h5 class="card-title">' + title + '</h5> <h6 class="card-subtitle text-muted">objective function <i>(' + objectiveFunctionType + ')</i></h6><div>';
 		
 		const HTML_STARTING_LENGTH = html.length;
 		
@@ -342,11 +342,6 @@
 			html += expression;
 		}
 		
-		html += '<h6 class="card-subtitle text-muted mt-2">analysis</h6>';
-		html += '<div>bounded: ' + analysis.bounded + '</div>';
-		html += '<div>feasible: ' + analysis.feasible + '</div>';
-		html += '<div>result: ' + analysis.result + '</div>';
-		
 		html += '<h6 class="card-subtitle text-muted mt-2">variables</h6>';
 		
 		for(var i = 1; i <= variablesCount; i++) {
@@ -387,6 +382,11 @@
 			
 			html += expression;
 		}
+		
+		html += '<h6 class="card-subtitle text-muted mt-2">analysis</h6>';
+		html += '<div>bounded: ' + analysis.bounded + '</div>';
+		html += '<div>feasible: ' + analysis.feasible + '</div>';
+		html += '<div>result: ' + analysis.result + '</div>';
 		
 		html += '</div></div>';
 		
