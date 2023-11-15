@@ -8,6 +8,17 @@ npm install -g pm2
 
 pm2 start server.js
 
+## Windows setup guide
+download Node.js and install it
+
+git clone this repo
+
+open a terminal in the git cloned directory
+
+run "npm install"
+
+run "node server.js"
+
 ![main page](docs/images/main.jpg?raw=true)
 ![exam 2 page](docs/images/exam2.jpg?raw=true)
 ![exam 3 page](docs/images/exam3.jpg?raw=true)
