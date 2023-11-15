@@ -1,4 +1,7 @@
 # cs6515-exam-tools
+
+note: the setup guides below suggest the use of the pm2 module for process management, but if you don't require process management, you can just use node to run the application natively without process management.
+
 ## Ubuntu Linux setup guide
 sudo snap install node --classic --channel=20
 
