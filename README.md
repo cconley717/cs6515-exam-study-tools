@@ -39,13 +39,13 @@ pm2 delete server
 ![exam 2 page](docs/images/exam2.jpg?raw=true)
 ![exam 3 page](docs/images/exam3.jpg?raw=true)
 
-### RSA solvers
+### RSA Solvers
 ![rsa page](docs/images/rsa.jpg?raw=true)
 
-### Graph algorithm solvers
+### Graph Algorithm
 ![graphs page](docs/images/graphs.jpg?raw=true)
 
-### Linear Programming solver
+### Linear Programming
 ![lp1 page](docs/images/lp1.jpg?raw=true)
 ![lp2 page](docs/images/lp2.jpg?raw=true)
 ![lp3 page](docs/images/lp3.jpg?raw=true)
