@@ -42,7 +42,7 @@ pm2 delete server
 ### RSA Solvers
 ![rsa page](docs/images/rsa.jpg?raw=true)
 
-### Graph Algorithm
+### Graph Algorithms
 ![graphs page](docs/images/graphs.jpg?raw=true)
 
 ### Linear Programming
