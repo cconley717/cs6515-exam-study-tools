@@ -21,8 +21,11 @@ run "pm2 start server.js"
 
 ## pm2 commands of interest
 pm2 list
+
 pm2 stop server
+
 pm2 restart server
+
 pm2 delete server
 
 ## Screenshots
