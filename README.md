@@ -18,7 +18,7 @@ pm2 start server.js
 ![graphs page](docs/images/graphs.jpg?raw=true)
 
 ### Linear Programming solver
-![lp page](docs/images/lp1.jpg?raw=true)
-![lp page](docs/images/lp2.jpg?raw=true)
-![lp page](docs/images/lp3.jpg?raw=true)
-![lp page](docs/images/lp4.jpg?raw=true)
+![lp1 page](docs/images/lp1.jpg?raw=true)
+![lp2 page](docs/images/lp2.jpg?raw=true)
+![lp3 page](docs/images/lp3.jpg?raw=true)
+![lp4 page](docs/images/lp4.jpg?raw=true)
