@@ -19,6 +19,8 @@ run "npm install"
 
 run "node server.js"
 
+## Screenshots
+
 ![main page](docs/images/main.jpg?raw=true)
 ![exam 2 page](docs/images/exam2.jpg?raw=true)
 ![exam 3 page](docs/images/exam3.jpg?raw=true)
