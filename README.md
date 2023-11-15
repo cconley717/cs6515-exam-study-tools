@@ -15,9 +15,11 @@ git clone this repo
 
 open a terminal in the git cloned directory
 
-run "npm install -g pm2"
+run command "npm install"
 
-run "pm2 start server.js"
+run command "npm install -g pm2"
+
+run command "pm2 start server.js"
 
 ## pm2 commands of interest
 pm2 list
