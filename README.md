@@ -12,9 +12,9 @@ npm install -g pm2
 pm2 start server.js
 
 ## Windows setup guide
-download Node.js and install it
+download [Node.js](https://nodejs.org/) and install it
 
-git clone this repo
+git clone this repo with a Windows git client
 
 open a terminal in the git cloned directory
 
