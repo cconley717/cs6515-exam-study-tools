@@ -1,6 +1,6 @@
 # cs6515-exam-tools
 
-**note**: The setup guides below suggest the use of the pm2 module for process management. If you don't require process management, you can just use node to run the application natively without process management.
+**note**: The setup guides below suggest the use of the pm2 module for process management. If you don't require process management, you can just use node to run this Express application natively without process management. Process management is useful if you're deploying this Express application on a remote server.
 
 ## Ubuntu Linux setup guide
 sudo snap install node --classic --channel=20
