@@ -1,4 +1,5 @@
 # cs6515-exam-tools
+## Ubuntu Linux setup guide
 sudo snap install node --classic --channel=20
 
 npm install
