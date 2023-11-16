@@ -7,6 +7,7 @@ const PORT = 80;
 
 app.use('/css', express.static(path.join(__dirname, '/public/css')));
 app.use('/javascript', express.static(path.join(__dirname, '/public/javascript')));
+app.use('/images', express.static(path.join(__dirname, '/public/images')));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/pages', 'index.html'));
