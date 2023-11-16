@@ -101,7 +101,7 @@
 				temp += '<input id="constraint_value_' + i + '_' + j + '" class="form-control" placeholder="x' + j + '"/>';
 			}
 			
-			temp += '<select id="constraint_type_' + i + '" class="form-select objective-function-select"> <option value="lte">&lt=</option> <option value="gte">&gt=</option> <option value="eq">=</option> </select>';
+			temp += '<select id="constraint_type_' + i + '" class="form-select objective-function-select"> <option value="lte">&lt=</option> <option value="gte">&gt=</option> </select>';
 			temp += '<input id="constraint_limit_' + i + '" class="form-control" placeholder=""/>';
 			temp += '</div>';
 			
@@ -163,9 +163,6 @@
 						}
 						else if(constraintType === 'gte') {
 							primal.constraints[constraint] = {'min': constraintLimit};
-						}
-						else if(constraintType === 'eq') {
-							primal.constraints[constraint] = {'equal': constraintLimit};
 						}
 						
 						const regex = /(-?\d+(\.\d+)?)x(\d+)/gi;
@@ -276,9 +273,6 @@
 						dual.constraints[constraint] = {'max': constraintLimit};
 					}
 				}
-				else if(constraintType === 'eq') {
-					dual.constraints[constraint] = {'equal': constraintLimit};
-				}
 				
 				const regex = /y(\d+)/i;
 				const match2 = match[0].match(regex);
@@ -332,9 +326,6 @@
 			}
 			else if(problem.constraints[constraint].hasOwnProperty('min')) {
 				expression += '>=' + problem.constraints[constraint].min;
-			}
-			else if(problem.constraints[constraint].hasOwnProperty('equal')) {
-				expression += '=' + problem.constraints[constraint].equal;
 			}
 			
 			expression += '</div>';
